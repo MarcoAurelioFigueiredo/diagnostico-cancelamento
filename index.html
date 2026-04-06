@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Pontua · Dashboard Churn 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9f9f8;--sf:#fff;--sf2:#f3f3f1;--sf3:#eaeae7;
+  --bd:rgba(0,0,0,0.08);--bd2:rgba(0,0,0,0.13);
+  --tx:#1a1a19;--mu:#8a8a85;--lt:#c5c5c0;
+  --ac:#2563eb;--ac2:#3b82f6;
+  --dn:#dc2626;--wn:#d97706;--ok:#16a34a;--inf:#0891b2;
+  --dn-b:rgba(220,38,38,0.07);--wn-b:rgba(217,119,6,0.08);
+  --ok-b:rgba(22,163,74,0.07);--inf-b:rgba(8,145,178,0.07);
+  --pr:#7c3aed;--ve:#ea580c;--cl:#0891b2;--at:#d97706;--pc:#16a34a;
+  --pr-b:rgba(124,58,237,0.08);--ve-b:rgba(234,88,12,0.08);
+  --cl-b:rgba(8,145,178,0.08);--at-b:rgba(217,119,6,0.08);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:.55rem 1.4rem;
+  background:var(--sf);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;gap:12px;flex-wrap:wrap}
+.tl{display:flex;align-items:center;gap:10px}
+.topbar img{height:26px;width:auto}
+.tdiv{width:1px;height:18px;background:var(--bd2)}
+.ttitle{font-size:12px;font-weight:500;color:var(--mu)}
+.tr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.upload-btn{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 10px;
+  border:1px solid var(--bd2);border-radius:6px;font-size:12px;color:var(--mu);
+  background:var(--sf2);transition:all .15s;white-space:nowrap}
+.upload-btn:hover{border-color:var(--ac2);color:var(--ac)}
+.upload-btn input{display:none}
+.fi{display:none;align-items:center;gap:5px;font-size:11px;color:var(--ok)}
+.fi.show{display:flex}
+.fi-dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.fi-x{color:var(--lt);cursor:pointer;margin-left:2px;font-size:13px}.fi-x:hover{color:var(--tx)}
+.nav{display:flex;gap:2px}
+.ntab{padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;
+  color:var(--mu);transition:all .15s;border:none;background:none}
+.ntab:hover{background:var(--sf2);color:var(--tx)}
+.ntab.active{background:var(--sf2);color:var(--tx)}
+.page{max-width:1100px;margin:0 auto;padding:1.4rem 1.4rem 3rem}
+.sh{margin-bottom:1.1rem}
+.ey{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:.3rem}
+.sh h2{font-size:19px;font-weight:600;margin-bottom:.15rem}
+.sh p{font-size:13px;color:var(--mu)}
+.kg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.2rem}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:.85rem 1rem}
+.kl{font-size:11px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.kv{font-size:23px;font-weight:600;line-height:1}
+.ks{font-size:11px;color:var(--mu);margin-top:4px}
+.kpi.kd{border-left:3px solid var(--dn)}.kpi.kw{border-left:3px solid var(--wn)}
+.kpi.ks2{border-left:3px solid var(--ok)}.kpi.ki{border-left:3px solid var(--inf)}
+.cd{color:var(--dn)}.cw{color:var(--wn)}.cs{color:var(--ok)}.ci{color:var(--inf)}
+.cp{color:var(--pr)}.cve{color:var(--ve)}.ccl{color:var(--cl)}.cat{color:var(--at)}
+.dv{height:1px;background:var(--bd);margin:1.2rem 0}
+.sl{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--mu);text-transform:uppercase;margin-bottom:.5rem}
+.tw{background:var(--sf);border:1px solid var(--bd);border-radius:10px;overflow:auto;margin-bottom:1.1rem}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{border-bottom:1px solid var(--bd)}
+th{padding:9px 12px;text-align:right;font-size:10px;font-weight:600;color:var(--mu);
+  letter-spacing:.06em;text-transform:uppercase;background:var(--sf2);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:9px 12px;text-align:right;border-bottom:1px solid var(--bd);font-variant-numeric:tabular-nums}
+td:first-child{text-align:left;font-weight:500}
+tr:last-child td{border-bottom:none}
+tr.tr-total td{background:var(--sf2);font-weight:600}
+tr.tr-sub td:first-child{padding-left:22px;color:var(--mu);font-weight:400;font-size:12px}
+tr.tr-sub td{font-size:12px}
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;
+  font-size:11px;font-weight:500;font-family:'DM Mono',monospace}
+.pd{background:var(--dn-b);color:var(--dn)}.pw{background:var(--wn-b);color:var(--wn)}
+.ps{background:var(--ok-b);color:var(--ok)}.pi{background:var(--inf-b);color:var(--inf)}
+.ppr{background:var(--pr-b);color:var(--pr)}.pve{background:var(--ve-b);color:var(--ve)}
+.pcl{background:var(--cl-b);color:var(--cl)}.pat{background:var(--at-b);color:var(--at)}
+.ppc{background:var(--ok-b);color:var(--pc)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.2rem}
+.cc{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:.95rem 1.1rem}
+.ct{font-size:12px;font-weight:500;color:var(--mu);margin-bottom:.7rem}
+.cw2{position:relative;width:100%}
+
+/* ── PILAR CARDS — redesigned without ações ── */
+.pg{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:1.4rem}
+.pc-card{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:1.1rem 1.2rem;
+  border-top:4px solid transparent}
+.pc-card-produto{border-top-color:var(--pr)}
+.pc-card-venda{border-top-color:var(--ve)}
+.pc-card-cliente{border-top-color:var(--cl)}
+.pc-card-atendimento{border-top-color:var(--at)}
+.pc-card-preco{border-top-color:var(--pc)}
+.pc-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.6rem}
+.pc-name{font-size:16px;font-weight:600}
+.pc-sub-name{font-size:11px;color:var(--mu);margin-top:2px}
+.pc-count{font-family:'DM Mono',monospace;font-size:28px;font-weight:600;text-align:right;line-height:1}
+.pc-pct-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;
+  font-weight:600;font-family:'DM Mono',monospace;margin-top:4px}
+.pc-bar-bg{height:4px;background:var(--sf2);border-radius:2px;margin:.7rem 0 .9rem}
+.pc-bar{height:4px;border-radius:2px}
+.pc-diag{font-size:12px;color:var(--tx);line-height:1.65;margin-bottom:.75rem;
+  padding:.65rem .8rem;background:var(--sf2);border-radius:8px}
+.pc-motivos-title{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--mu);margin-bottom:.45rem}
+.pc-motivo{display:flex;justify-content:space-between;align-items:center;
+  padding:.4rem 0;border-bottom:1px solid var(--bd);gap:8px}
+.pc-motivo:last-child{border-bottom:none;padding-bottom:0}
+.pc-ml{font-size:12px;color:var(--mu);line-height:1.3}
+.pc-mr{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.pc-mcount{font-family:'DM Mono',monospace;font-size:13px;font-weight:600}
+.pc-mpct{font-size:11px;color:var(--mu)}
+
+/* ── BASE TABLE ── */
+.base-wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:10px;background:var(--sf)}
+.base-wrap table{min-width:1900px;font-size:12px}
+.base-wrap th{font-size:9px;padding:8px 10px;white-space:nowrap}
+.base-wrap td{padding:8px 10px;vertical-align:top}
+.td-num{text-align:center;color:var(--mu);font-size:11px;min-width:32px}
+.td-empresa{min-width:180px;max-width:210px;white-space:normal;line-height:1.3;font-size:12px;text-align:left;font-weight:500}
+.td-email{min-width:170px;max-width:200px;white-space:normal;word-break:break-all;font-size:11px;color:var(--mu);text-align:left}
+.td-motivo{min-width:180px;max-width:220px;white-space:normal;line-height:1.4;font-size:11px;text-align:left}
+.td-det{min-width:190px;max-width:240px;white-space:normal;line-height:1.4;font-size:11px;color:var(--mu);text-align:left}
+.td-anal{min-width:250px;max-width:320px;white-space:normal;line-height:1.5;font-size:11px;color:var(--mu);text-align:left}
+.td-center{text-align:center}
+.lgr{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--mu);margin-bottom:.9rem}
+.lgi{display:flex;align-items:center;gap:5px}
+.lgd{width:8px;height:8px;border-radius:2px}
+.ph{border:1.5px dashed rgba(37,99,235,.3);border-radius:12px;padding:2rem;
+  text-align:center;margin:2rem auto;max-width:460px;background:rgba(37,99,235,.02)}
+.ph h3{font-size:15px;font-weight:500;margin-bottom:.4rem}
+.ph p{font-size:13px;color:var(--mu)}
+.ph-btn{display:inline-block;margin-top:1rem;padding:8px 20px;background:var(--ac);
+  color:#fff;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none}
+/* ── FOOTER ── */
+.footer{border-top:1px solid var(--bd);padding:1.2rem 1.4rem;margin-top:2rem;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.footer-inner{max-width:1100px;margin:0 auto;width:100%;display:flex;align-items:center;
+  justify-content:space-between;flex-wrap:wrap;gap:8px}
+.footer-resp{font-size:12px;color:var(--mu)}
+.footer-resp strong{color:var(--tx);font-weight:500}
+.footer-resp a{color:var(--ac);text-decoration:none}
+.footer-resp a:hover{text-decoration:underline}
+.footer-badge{font-family:'DM Mono',monospace;font-size:10px;color:var(--lt);letter-spacing:.05em}
+/* ── EXPORT BTN ── */
+.export-bar{display:flex;align-items:center;gap:8px;margin-bottom:.9rem}
+.export-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 13px;
+  border:1px solid var(--bd2);border-radius:7px;font-size:12px;font-weight:500;
+  color:var(--mu);background:var(--sf);cursor:pointer;transition:all .15s}
+.export-btn:hover{border-color:var(--ok);color:var(--ok);background:var(--ok-b)}
+.export-btn.csv:hover{border-color:var(--inf);color:var(--inf);background:var(--inf-b)}
+.export-btn svg{flex-shrink:0}
+.tab-content{display:none}.tab-content.active{display:block}
+@media(max-width:680px){
+  .kg{grid-template-columns:1fr 1fr}
+  .cg,.pg{grid-template-columns:1fr}
+  .page{padding:1rem}
+  .nav .ntab{font-size:11px;padding:4px 7px}
+}
+
+.base-wrap table{min-width:2600px;font-size:13px}
+.td-sint{min-width:145px;max-width:185px;white-space:normal;line-height:1.6;font-size:13px;font-style:italic;color:var(--tx);text-align:left}
+.td-anal{min-width:910px;max-width:1200px;white-space:normal;line-height:1.9;font-size:13px;color:var(--mu);text-align:left}
+.td-mc{min-width:72px;white-space:nowrap;text-align:center;font-weight:700;font-size:13px;background:#FFFBEB;color:#92400E}
+.td-det{min-width:185px;max-width:225px;white-space:normal;line-height:1.6;font-size:13px;color:var(--mu);text-align:left}
+.td-empresa{min-width:185px;max-width:215px;white-space:normal;line-height:1.4;font-size:14px;text-align:left;font-weight:600}
+.base-scroll-top{overflow-x:auto;overflow-y:hidden;height:14px;margin-bottom:3px}
+.base-scroll-top-inner{height:1px;background:transparent}
+.base-content-outer{display:flex;flex-direction:column}
+.num-btn{cursor:pointer;border:none;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline dotted;text-underline-offset:3px}
+.num-btn:hover{opacity:.75}
+#kpiGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:1.5rem}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tl">
+    <img src="data:image/png;base64,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" alt="Pontua"/>
+    <div class="tdiv"></div>
+    <span class="ttitle">Equipe Relacionamento e CX</span>
+  </div>
+  <div class="tr">
+    <div class="fi" id="fi">
+      <div class="fi-dot"></div><span id="fiName"></span>
+      <span class="fi-x" onclick="resetFile()">✕</span>
+    </div>
+    <label class="upload-btn" for="fileInput">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+        <path d="M8 2v9M4 6l4-4 4 4M2 13h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Carregar planilha
+      <input type="file" id="fileInput" accept=".xlsx,.xls"/>
+    </label>
+    <div class="nav">
+      <button class="ntab active" onclick="showTab('churn',this)">Churn</button>
+      <button class="ntab" onclick="showTab('diag',this)">Diagnóstico</button>
+      <button class="ntab" onclick="showTab('pilares',this)">Análise por Pilar</button>
+      <button class="ntab" onclick="showTab('base',this)">Base 2026</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CHURN ═══ -->
+<div id="tab-churn" class="tab-content active"><div class="page">
+  <div class="sh"><div class="ey">Reporte de Churn · 2026</div><h2>Dashboard Consolidado</h2>
+    <p id="churnMeta">Carregue o arquivo <strong>Pontua_Dashboard_v5.xlsx</strong> para atualizar</p></div>
+  <div class="ph" id="churnPh">
+    <div style="font-size:28px;margin-bottom:.6rem">📊</div>
+    <h3>Nenhum arquivo carregado</h3>
+    <p>Carregue o <strong>Pontua_Dashboard_Unificado_2026.xlsx</strong></p>
+    <label class="ph-btn" for="fileInput">Carregar arquivo</label>
+  </div>
+  <div id="churnContent" style="display:none">
+    <div class="kg" id="kpiGrid"></div>
+    <div class="sl">Detalhamento mensal</div>
+    <div class="tw"><table><thead><tr>
+      <th style="white-space:nowrap;min-width:80px;max-width:90px">Mês</th><th>Base início</th><th>+ Vendidos</th><th>− Cancelados</th>
+      <th>Base fim</th><th>Churn %</th><th>MRR Cancel. Médio</th><th>Churn acum.</th>
+      <th style="color:#0e7490;white-space:nowrap">Churn MRR %</th>
+      <th style="color:#0e7490;white-space:nowrap">MRR Base Total</th>
+    </tr></thead><tbody id="mainTbody"></tbody></table></div>
+    <div class="lgr">
+      <span class="lgi"><span class="lgd" style="background:var(--ok)"></span>Saudável &lt;1,5%</span>
+      <span class="lgi"><span class="lgd" style="background:var(--wn)"></span>Atenção 1,5–2,9%</span>
+      <span class="lgi"><span class="lgd" style="background:var(--dn)"></span>Crítico ≥3%</span>
+    </div>
+    <div class="cg" style="grid-template-columns:1fr 1fr">
+      <div class="cc"><div class="ct">Churn médio mensal (%)</div><div class="cw2" style="height:210px"><canvas id="cMedio"></canvas></div></div>
+      <div class="cc"><div class="ct">Churn MRR médio mensal (%)</div><div class="cw2" style="height:210px"><canvas id="cMrrChurn"></canvas></div></div>
+    </div>
+    <div class="cg" style="grid-template-columns:1fr 1fr 1fr;margin-top:0">
+      <div class="cc"><div class="ct">Progressão da base de contratos</div><div class="cw2" style="height:210px"><canvas id="cBase"></canvas></div></div>
+      <div class="cc"><div class="ct">MRR cancelado por mês (R$)</div><div class="cw2" style="height:210px"><canvas id="cMrr"></canvas></div></div>
+      <div class="cc"><div class="ct">Churn mensal por período (%)</div><div class="cw2" style="height:210px"><canvas id="cMensal"></canvas></div></div>
+    </div>
+  </div>
+</div></div>
+
+<!-- ═══ DIAGNÓSTICO ═══ -->
+<div id="tab-diag" class="tab-content"><div class="page">
+  <div class="sh"><div class="ey">Diagnóstico · 2026</div><h2>Diagnóstico de Cancelamentos</h2>
+    <p id="diagMeta">Carregue o arquivo para atualizar</p></div>
+  <div class="ph" id="diagPh">
+    <div style="font-size:28px;margin-bottom:.6rem">🔍</div><h3>Nenhum arquivo carregado</h3>
+    <p>Carregue o <strong>Pontua_Dashboard_Unificado_2026.xlsx</strong></p>
+    <label class="ph-btn" for="fileInput">Carregar arquivo</label>
+  </div>
+  <div id="diagContent" style="display:none">
+    <div class="kg" id="diagKpi"></div>
+    <div class="dv"></div>
+    <div class="cg">
+      <div class="cc"><div class="ct">Cancelamentos por pilar</div><div class="cw2" style="height:210px"><canvas id="cPilH"></canvas></div></div>
+      <div class="cc"><div class="ct">Proporção por pilar (%)</div><div class="cw2" style="height:210px"><canvas id="cPilD"></canvas></div></div>
+    </div>
+    <div class="dv"></div>
+    <div class="sl">Distribuição de sub-motivos</div>
+    <div class="tw"><table><thead><tr><th>Sub-Motivo</th><th>Pilar</th><th>% Total</th></tr></thead>
+      <tbody id="subTbody"></tbody></table></div>
+    <div class="dv"></div>
+    <div class="sl">Sugestões mais recorrentes</div>
+    <div class="tw"><table><thead><tr><th>Sugestão</th><th>Ocorrências</th><th>% das Sugestões</th></tr></thead>
+      <tbody id="sugTbody"></tbody></table></div>
+  </div>
+</div></div>
+
+<!-- ═══ PILARES ═══ -->
+<div id="tab-pilares" class="tab-content"><div class="page">
+  <div class="sh"><div class="ey">Análise Estratégica · Pilar 1 = Causa Raiz · Pilar 2 = Influenciador</div>
+    <h2>Análise por Pilares de Cancelamento</h2><p id="pilarMeta">Carregue o arquivo para atualizar</p></div>
+  <div class="ph" id="pilarPh">
+    <div style="font-size:28px;margin-bottom:.6rem">📋</div><h3>Nenhum arquivo carregado</h3>
+    <p>Carregue o <strong>Pontua_Dashboard_Unificado_2026.xlsx</strong></p>
+    <label class="ph-btn" for="fileInput">Carregar arquivo</label>
+  </div>
+  <div id="pilarContent" style="display:none">
+    <div class="pg" id="pilarCards"></div>
+    <div class="dv"></div>
+    <div class="sl">Tabela consolidada por pilar</div>
+    <div class="tw"><table><thead><tr>
+      <th>Pilar / Motivo</th><th>Qtd.</th><th>% Total</th><th>Diagnóstico</th>
+    </tr></thead><tbody id="pilarTbody"></tbody></table></div>
+    <div class="lgr" style="margin-top:.5rem" id="pilarLegend"></div>
+  </div>
+</div></div>
+
+<!-- ═══ BASE 2026 ═══ -->
+<div id="tab-base" class="tab-content"><div class="page">
+  <div class="sh"><div class="ey">Base de Dados · Pontua · 2026</div>
+    <h2>Base Completa de Cancelamentos</h2><p id="baseMeta">Carregue o arquivo para atualizar</p></div>
+  <div class="ph" id="basePh">
+    <div style="font-size:28px;margin-bottom:.6rem">📁</div><h3>Nenhum arquivo carregado</h3>
+    <p>Carregue o <strong>Pontua_Dashboard_Unificado_2026.xlsx</strong></p>
+    <label class="ph-btn" for="fileInput">Carregar arquivo</label>
+  </div>
+  <div id="baseContent" style="display:none">
+    <div class="export-bar">
+      <button class="export-btn" onclick="exportBase('xlsx')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M5 8h6M5 5.5h6M5 10.5h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Exportar Excel (.xlsx)
+      </button>
+      <button class="export-btn csv" onclick="exportBase('csv')">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h10M3 12h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Exportar CSV
+      </button>
+    </div>
+    <div class="lgr">
+      <span class="lgi"><span class="lgd" style="background:var(--pr)"></span>Produto</span>
+      <span class="lgi"><span class="lgd" style="background:var(--cl)"></span>Cliente</span>
+      <span class="lgi"><span class="lgd" style="background:var(--ve)"></span>Venda</span>
+      <span class="lgi"><span class="lgd" style="background:var(--at)"></span>Suporte</span>
+      <span class="lgi"><span class="lgd" style="background:var(--inf)"></span>Dif. Técnica</span>
+      <span class="lgi" style="font-style:italic;color:var(--mu);font-size:11px">🟡 Amarelo = Causa Raiz</span>
+      <span class="lgi"><span class="lgd" style="background:var(--at)"></span>Pilar Suporte</span>
+    </div>
+    <div class="base-content-outer" id="baseScrollOuter"><div class="base-scroll-top" id="baseScrollTop"><div class="base-scroll-top-inner" id="baseScrollTopInner"></div></div><div class="base-wrap" id="baseWrap"><table><thead><tr><th class="td-num">#</th><th style="min-width:175px;text-align:left">Empresa</th><th style="min-width:140px;text-align:left;font-size:11px">E-mail</th><th style="text-align:center;white-space:nowrap">Data Ativação</th><th style="text-align:center;white-space:nowrap">Data Cancelamento</th><th style="text-align:center;white-space:nowrap">Tempo de Base</th><th style="min-width:105px;text-align:right;white-space:nowrap">MRR (R$)</th><th style="text-align:center">Pilar 1</th><th style="text-align:center">Pilar 2</th><th style="min-width:130px;text-align:center">Motivo Central</th><th style="min-width:260px;text-align:left">Síntese da Causa Raiz</th><th style="min-width:160px;text-align:left">Motivo Principal</th><th style="min-width:170px;text-align:left">Detalhes Técnicos</th><th style="min-width:160px;text-align:left">Sugestão de Melhoria</th><th style="text-align:center">Dif. Técnica</th><th style="text-align:center;white-space:nowrap">Passou pela retenção</th><th style="min-width:260px;text-align:left">Análise Investigativa</th></tr></thead>
+      <tbody id="baseTbody"></tbody></table>
+    </div>
+  </div>
+</div></div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <div class="footer-resp">
+      <strong>Responsável:</strong> Marco Aurélio Figueiredo &nbsp;·&nbsp;
+      Relacionamento CX &nbsp;·&nbsp;
+      <a href="mailto:contacomigo@pontua.com.br">contacomigo@pontua.com.br</a>
+    </div>
+    <div class="footer-badge">Pontua · Dashboard Churn 2026</div>
+  </div>
+</div>
+
+<script>
+const PONTUA_DATA={"mensal": [{"mes": "Janeiro", "baseIn": 406.0, "vendidos": 65.0, "cancel": 10.0, "mrr": 947.0, "churn_mrr": 0.01059367065, "mrr_base": 89393.0}, {"mes": "Fevereiro", "baseIn": 461.0, "vendidos": 68.0, "cancel": 10.0, "mrr": 3198.0, "churn_mrr": 0.02931523086, "mrr_base": 109090.05}, {"mes": "Marco", "baseIn": 519.0, "vendidos": 65.0, "cancel": 23.0, "mrr": 3178.0, "churn_mrr": 0.0262222212, "mrr_base": 121194.92}], "med_churn": 0.02790395847, "med_churnmrr": 0.02204370757, "med_mrr": 2441.0, "med_mrr_base": 106559.3233, "pilaresDiag": [{"name": "Produto", "qtd": 21.0, "pct": 0.5, "diag": "Produto n\u00e3o entrega o esperado: funcionalidades abaixo do contratado + instabilidade t\u00e9cnica = principal causa de cancelamento na Pontua"}, {"name": "Cliente", "qtd": 10.0, "pct": 0.2380952381, "diag": "Motivos internos do cliente (fechamento, reestrutura\u00e7\u00e3o, n\u00e3o adapta\u00e7\u00e3o) fora do controle direto da Pontua"}, {"name": "Venda", "qtd": 8.0, "pct": 0.1904761905, "diag": "Desalinhamento entre venda e uso real: perfil n\u00e3o aderente, churn volunt\u00e1rio p\u00f3s-venda e expectativas mal gerenciadas"}, {"name": "Suporte", "qtd": 3.0, "pct": 0.07142857143, "diag": "Atendimento n\u00e3o supre o cliente no momento cr\u00edtico: tempo de resolu\u00e7\u00e3o alto e qualidade percebida como baixa"}, {"name": "Pre\u00e7o", "qtd": 0.0, "pct": 0.0, "diag": "Percep\u00e7\u00e3o de valor n\u00e3o justifica o pre\u00e7o cobrado; cliente cancela ao encontrar alternativas com custo percebido menor"}], "sugRows": [{"sug": "Melhorar a experi\u00eancia de uso", "qtd": 9, "pct": 0.375}, {"sug": "Reduzir o pre\u00e7o", "qtd": 5, "pct": 0.208333333333333}, {"sug": "Melhorar o suporte", "qtd": 5, "pct": 0.208333333333333}, {"sug": "Adicionar funcionalidades espec\u00edficas", "qtd": 5, "pct": 0.208333333333333}], "subMot": [["Instabilidade do produto", "Produto", 0.238095], ["Decis\u00e3o interna", "Cliente", 0.214286], ["Produto n\u00e3o atendeu", "Produto", 0.190476], ["N\u00e3o engajou / sem uso", "Venda", 0.095238], ["Perfil n\u00e3o aderente", "Venda", 0.071429], ["Falha no suporte", "Suporte", 0.071429], ["Migra\u00e7\u00e3o para concorrente", "Produto", 0.071429], ["Fechamento da empresa", "Cliente", 0.02381], ["Venda inadequada", "Venda", 0.02381]], "pilaresAnalise": [{"name": "Produto", "rawKey": "PRODUTO", "qtd": 21, "pct": 0.5, "diag": "Produto nao entrega o esperado: funcionalidades abaixo do contratado + instabilidade tecnica", "motivos": [{"label": "Nao atende as necessidades", "qtd": 10, "pct": 0.2381, "diag": "Funcionalidades aquem do prometido; produto nao resolve o problema central do cliente"}, {"label": "Problemas tecnicos / Bugs", "qtd": 6, "pct": 0.1429, "diag": "Instabilidade recorrente, falhas no registro de ponto e erros de geolocalizacao"}, {"label": "Instabilidade / Performance", "qtd": 5, "pct": 0.119, "diag": "Lentidao, sistema fora do ar e inconsistencias que impactaram a operacao diaria"}]}, {"name": "Cliente", "rawKey": "CLIENTE", "qtd": 10, "pct": 0.2381, "diag": "Motivos internos do cliente (fechamento, reestruturacao, nao adaptacao) fora do controle direto da Pontua", "motivos": [{"label": "Decisao interna / Reestruturacao", "qtd": 9, "pct": 0.2143, "diag": "Encerramento de atividades, mudancas de diretriz ou colaboradores que nao adotaram a solucao"}, {"label": "Fechamento da empresa", "qtd": 1, "pct": 0.0238, "diag": "Empresa decretou falencia; cancelamento sem relacao com o produto"}]}, {"name": "Venda", "rawKey": "VENDA", "qtd": 8, "pct": 0.1905, "diag": "Desalinhamento entre venda e uso real: perfil nao aderente, churn voluntario pos-venda e expectativas mal gerenciadas", "motivos": [{"label": "Nao engajou / sem uso", "qtd": 4, "pct": 0.0952, "diag": "Cliente nao engajou pos-venda; desistiu antes ou logo apos o treinamento"}, {"label": "Perfil nao aderente", "qtd": 3, "pct": 0.0714, "diag": "Cliente contratou sem estrutura ou perfil adequado para adotar a solucao"}, {"label": "Venda inadequada", "qtd": 1, "pct": 0.0238, "diag": "Proposta comercial prometeu funcionalidade que o produto nao suporta"}]}, {"name": "Suporte", "rawKey": "SUPORTE", "qtd": 3, "pct": 0.0714, "diag": "Atendimento nao supre o cliente no momento critico: resolucao lenta, informacao incorreta e qualidade percebida como baixa", "motivos": [{"label": "Falha no suporte / Informacao incorreta", "qtd": 2, "pct": 0.0476, "diag": "Informacao incorreta sobre portaria 671 MTE gerando inseguranca juridica"}, {"label": "Falha no suporte / Demora", "qtd": 1, "pct": 0.0238, "diag": "Cancelamento ignorado por 9 dias; cliente percebeu abandono no momento critico"}]}, {"name": "Preco", "rawKey": "PRECO", "qtd": 0, "pct": 0.0, "diag": "Percepcao de valor nao justifica o preco cobrado", "motivos": [{"label": "Custo-beneficio negativo", "qtd": 0, "pct": 0.0, "diag": "-"}]}], "base": [[1, "COM VOCE SCALA LTDA", "igormachado@scalagestao.com.br", "28/05/2025", "27/03/2026", 303, 149.9, "Produto", "Concorr\u00eancia", "Instabilidade do produto", "Falhas recorrentes de registro e configura\u00e7\u00e3o complexa levaram \u00e0 migra\u00e7\u00e3o para concorrente.", "Encontrei uma solu\u00e7\u00e3o melhor", "Sistema registrava errado o ponto dos funcion\u00e1rios", "Melhorar a experi\u00eancia de uso", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente alegou que encontrou solu\u00e7\u00e3o melhor devido a ter tido uma experi\u00eancia bastante atritada com a plataforma, apresentando algumas falhas e configura\u00e7\u00f5es dificultosas, impactando o dia a dia da empresa. Colocou como melhoria o aprimoramento da experi\u00eancia de uso. N\u00e3o deu abertura para buscarmos a revers\u00e3o. Em hist\u00f3rico o mesmo acionou o Suporte por diversas vezes, tendo a sua d\u00favida sanada pelo Hor\u00e1cio e parte pelo atendimento humano, que prestou todos os esclarecimentos. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [2, "IMMECH ENGENHARIA LTDA", "comercial@immech.com.br", "29/04/2025", "27/03/2026", 332, 63.92, "Produto", "Produto", "Instabilidade do produto", "Instabilidade no registro de ponto impactou opera\u00e7\u00e3o; produto n\u00e3o atendeu expectativa funcional.", "N\u00e3o atende \u00e0s minhas necessidades", "Funcion\u00e1rios n\u00e3o conseguiam bater ponto e ponto irregular", "o sistema \u00e9 bem intuitivo, nada a reclamar.", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente solicitou o cancelamento alegando que a solu\u00e7\u00e3o n\u00e3o atende as suas expectativas, apontou a necessidade de melhoria no uso. Investigando os atendimentos, cliente recorreu por v\u00e1rias vezes ao Suporte alegando dificuldades e inconsist\u00eancias. Foi prontamente atendido em v\u00e1rios momentos mas decidiu mudar para outra solu\u00e7\u00e3o. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [3, "AMPLAPACK EMBALAGENS DE PROTECAO LTDA", "vendas@amplapack.com.br", "04/02/2026", "27/03/2026", 51, 144.0, "Cliente", "Cliente", "Decis\u00e3o interna", "Decis\u00e3o estrat\u00e9gica interna: empresa retornou \u00e0 solu\u00e7\u00e3o anterior sem rela\u00e7\u00e3o com o produto.", "Vamos seguir com outra solu\u00e7\u00e3o (n\u00e3o \u00e9 o momento da empresa)", "-", "", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente solicitou o cancelamento pois optou por retornar com a solu\u00e7\u00e3o antiga devido a estrat\u00e9gia interna, elogiou a solu\u00e7\u00e3o e disse que n\u00e3o \u00e9 o momento da empresa, segue a VoC do cliente \"Gostar\u00edamos de cancelar a solu\u00e7\u00e3o. Achamos a ferramenta muito intuitiva e produtiva, por\u00e9m no momento vamos seguir com o modelo antigo\". Sendo assim o Pilar 1 \"Cliente\" e Pilar 2 \"Cliente\""], [4, "SANTO PAO LTDA", "santopao.industria@gmail.com / joaosiqueirasouza@hotmail.com", "25/01/2025", "26/03/2026", 425, 149.9, "Produto", "Concorr\u00eancia", "Instabilidade do produto", "Experi\u00eancia de uso atritada com diversas dificuldades operacionais culminou em migra\u00e7\u00e3o para concorrente.", "Encontrei uma solu\u00e7\u00e3o melhor", "Enfrentei varias dificuldades", "Melhorar a experi\u00eancia de uso", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente solicitou o cancelamento alegando que encontrou solu\u00e7\u00e3o melhor e refor\u00e7ou que teve diversas dificuldades no uso, o que impactou a experi\u00eancia de uso. Fazendo a an\u00e1lise nos atendimentos pelo Intercom, foi constatado que o cliente apresentou problemas com hor\u00e1rios divergentes e contabilidades incorretas de HE e banco de horas, a maioria dos problemas relatados ocorreram no per\u00edodo de instabilidade da plataforma de 26 a 02/03, motivando o cliente a buscar outra solu\u00e7\u00e3o. Foi atendido prontamente sempre que necessitou de Suporte. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [5, "PHAMELA DE CASTRO MANSAN", "phamelacastro2424@gmail.com", "04/03/2026", "25/03/2026", 21, 109.0, "Venda", "Pre\u00e7o", "Perfil n\u00e3o aderente", "Desist\u00eancia no treinamento aliada a concorrente com pre\u00e7o melhor e ader\u00eancia \u00e0 necessidade.", "Encontrei uma solu\u00e7\u00e3o melhor / Necessidade tempor\u00e1ria conclu\u00edda", "", "Reduzir o pre\u00e7o", "N\u00e3o", "Sim", "An\u00e1lsie Investigativa: Cliente solicitou o cancelamento alegando que encontrou solu\u00e7\u00e3o melhor com melhor pre\u00e7o, investigando o contatos pelo Intercom, ao realizar a etapa de treinamento cliente alegou que n\u00e3o foi informada do que precisaria ter para esta a\u00e7\u00e3o, veja a VoC do cliente \"Pois \u00e9, voc\u00eas tamb\u00e9m num quest\u00e3o de organiza\u00e7\u00e3o das dois partes, n\u00e9? Voc\u00eas deveriam ter falado que a gente deveria ter hor\u00e1rio em m\u00e3os, isso voc\u00eas n\u00e3o falaram, voc\u00eas s\u00f3 falaram de treinamento.\" Ou seja, ela alega que n\u00e3o recebeu instru\u00e7\u00f5es de como esse treinamento \u00e9 realizado, gerando desgaste em seu processo de implanta\u00e7\u00e3o. Optou por cancelar muito em fun\u00e7\u00e3o da experi\u00eancia negativa. Sendo assim Pilar 1 \"Vendas\" e Pilar 2 \"Concorr\u00eancia\""], [6, "V-MOTORS LTDA", "vmotors091@gmail.com", "09/12/2025", "25/03/2026", 106, 144.0, "Cliente", "Cliente", "Decis\u00e3o interna", "Necessidade tempor\u00e1ria de controle de ponto encerrada; cliente sem reclama\u00e7\u00f5es sobre o produto.", "Necessidade tempor\u00e1ria conclu\u00edda", "-", "Nada", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cliente alega que teve a sua necessidade tempor\u00e1ria conclu\u00edda, n\u00e3o apontou dificuldades em utilizar a plataforma e investigando os atendimentos, possui apenas o pedido formalizado por e-mail de cancelamento da solu\u00e7\u00e3o. Feito tentativa de contato para reten\u00e7\u00e3o, por\u00e9m cliente est\u00e1 decidido. Sendo assim Pilar 1 \"Cliente\" e Pilar 2 \"Cliente."], [7, "CACILDO PEREIRA DE FREITAS FILHO LTDA", "cfservicosagricolas@gmail.com", "24/02/2025", "24/03/2026", 393, 109.0, "Venda", "Cliente", "Perfil n\u00e3o aderente", "Perfil da empresa incompat\u00edvel com solu\u00e7\u00e3o; colaboradores n\u00e3o adotaram o sistema de ponto.", "Colaboradores n\u00e3o se adequaram ao sistema de ponto", "", "Nesse caso, na h\u00e1 provid\u00eancias a serem tomas", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cliente alega que n\u00e3o tem nada a reclamar da Pontua, e que os colaboradores de sua empresa n\u00e3o se adequaram a solu\u00e7\u00e3o devido ao perfil da empresa. N\u00e3o teve problemas na plataforma e optou por cancelar.. Sendo assim Pilar 1 \"Cliente\" e Pilar 2 \"Produto\""], [8, "MELO LAVANDERIA LTDA", "elavlavanderia@hotmail.com / marjoriesmelo@hotmail.com", "29/01/2026", "23/03/2026", 53, 79.9, "Produto", "Suporte", "Produto n\u00e3o atendeu", "Dificuldades de uso sem resolu\u00e7\u00e3o satisfat\u00f3ria; suporte insuficiente para garantir a reten\u00e7\u00e3o.", "N\u00e3o atende \u00e0s minhas necessidades", "-", "Melhorar o suporte", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente alegou que a soliu\u00e7\u00e3o n\u00e3o atende as necesidades, enfrentou dificuldades de uso e optou pelo cancelamento. Citou como oportunidade de melhoria melhor o Suporte, por\u00e9m n\u00e3o h\u00e1 registro de atendimento a cliente para auxiliar e apoiar, ficando claro que a percep\u00e7\u00e3o da mesma \u00e9 quanto ao apoio em si. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Suporte\""], [9, "WLC CONSTRUCOES LTDA", "Wilaraujo41@gmail.com", "19/02/2026", "20/03/2026", 29, 129.6, "Venda", "Concorr\u00eancia", "N\u00e3o engajou / sem uso", "Desist\u00eancia pr\u00e9-treinamento ao encontrar concorrente mais aderente e com melhor custo-benef\u00edcio.", "N\u00e3o atende \u00e0s minhas necessidades / Encontrei uma solu\u00e7\u00e3o melhor", "Resposta correta", "Reduzir o pre\u00e7o", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente alegou que desistiu da contrata\u00e7\u00e3o antes do treinamento, pois encontrou solu\u00e7\u00e3o mais adequada a sua necessidade com pre\u00e7o melhor. Investigando no Intercom cliente alega que n\u00e3o quer mais. Ressaltou tamb\u00e9m como sugest\u00e3o a quest\u00e3o do pre\u00e7o. Sendo assim Pilar 1 \"Cliente\" e Pilar 2 \"Concorrente\" como oportunidade de melhoria"], [10, "MARCELO GOMES RICARDO", "mgrcontato@gmail.com", "11/07/2025", "20/03/2026", 252, 187.4, "Produto", "Suporte", "Instabilidade do produto", "Produto inst\u00e1vel com m\u00faltiplos bugs e lentid\u00e3o; mais de 10 atendimentos sem resolu\u00e7\u00e3o definitiva.", "Problemas t\u00e9cnicos ou bugs / Problemas com o suporte / N\u00e3o atende \u00e0s minhas necessidades", "todas poss\u00edveis, bug, sistema lento, fora do ar entre outros", "Melhorar o suporte", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente apresentou diversas dificuldade ao longo do uso da plataforma, registrou mais de 10 atendimentos pedindo apoio e foi atendido em todos eles, seja pelo Hor\u00e1cio seja pelo Atendimento Humano, motivo principal do cancelamento foi devido a uma experi\u00eancia ruim de uso somado a momentos de instabilidade. Citou melhorar o suporte, mas n\u00e3o foi identificamos oportunidades em seus acionamentos. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Suporte\" como oportunidade de melhoria"], [11, "SANTANA EUCALIPTO TRATADO LTDA", "santanaeucalipto@gmail.com", "07/11/2025", "19/03/2026", 132, 109.0, "Produto", "Concorr\u00eancia", "Instabilidade do produto", "Falhas de geolocaliza\u00e7\u00e3o e registro incorreto de ponto impulsionaram migra\u00e7\u00e3o para concorrente.", "Encontrei uma solu\u00e7\u00e3o melhor", "Horas erradas, dificuldades para bater ponto, erro de localiza\u00e7\u00e3o", "Melhorar a experi\u00eancia de uso", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente demonstrou grande insatisfa\u00e7\u00e3o com a performance inst\u00e1vel da plataforma e dificuldade de manusear a aplica\u00e7\u00e3o, tanto para bater o ponto quanto para situa\u00e7\u00f5es de registros com horas erradas. Foi atendido prontamente para sanar seus problemas, por\u00e9m optou por uma outra solu\u00e7\u00e3o que considerou ser melhor. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [12, "HORTIFRUTI ALIMENTOS LTDA", "distribuidorajdl@gmail.com", "21/10/2025", "18/03/2026", 148, 144.0, "Produto", "Suporte", "Produto n\u00e3o atendeu", "Fric\u00e7\u00e3o com atendimento exclusivo por chat; dificuldades de adapta\u00e7\u00e3o ao sistema n\u00e3o revertidas.", "N\u00e3o atende \u00e0s minhas necessidades", "s\u00f3 conseguia falar por chat", "Melhorar o suporte", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente foi atendimenta pelo suporte conforme processo, e mostrou certo inc\u00f4modo com o atendimento por chat, fizemos atendimento por meeting para ajud\u00e1-la mas apresentava bastante dificuldade na configura\u00e7\u00e3o e gest\u00e3o do sistema,alego que n\u00e3o se adaptou"], [13, "OLIVEIRA E BROLEZE", "zuadmvaaptyamparo@gmail.com", "17/10/2025", "17/03/2026", 151, 144.0, "Cliente", "Cliente", "Decis\u00e3o interna", "Baixa ades\u00e3o interna dos colaboradores ao sistema; cancelamento sem rela\u00e7\u00e3o com falhas do produto.", "Colaboradores n\u00e3o estavam utilizando", "", "Nada! Voc\u00eas n\u00e3o tiveram nada a ver com nosso cancelamento", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente foi atendido pelo suporte e teve seu problema resolvido quando necesitou, realmente n\u00e3o se adaptou e disse que os colaboradores n\u00e3o estavam usando. Alegou que n\u00e3o tem nada em rela\u00e7\u00e3o a empresa"], [14, "JGM STEEL ENGENHARIA", "carlasoaressteelengenharia@gmail.com", "23/10/2025", "17/03/2026", 145, 377.0, "Produto", "Pre\u00e7o", "Instabilidade do produto", "Instabilidade recorrente do aplicativo degradou opera\u00e7\u00e3o; cliente migrou para alternativa mais barata.", "Encontrei uma solu\u00e7\u00e3o melhor", "Instabilidade do aplicativo, sistema muito inst\u00e1vel", "Reduzir o pre\u00e7o", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente alegou que o cancelamento deve-se pelas constantes instabilidades que geraram impactos para a empresa, mudou para outra solu\u00e7\u00e3o que alega ser melhor e mais barata. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Pre\u00e7o\""], [15, "MEDITERRANEO ORFEUS", "orfeus.bistro.natal@gmail.com", "25/08/2025", "17/03/2026", 204, 377.0, "Cliente", "Cliente", "Fechamento da empresa", "Encerramento de atividades por fal\u00eancia; cancelamento sem rela\u00e7\u00e3o com desempenho do produto.", "Fechamento da empresa", "", "Estamos encerrando as atividades", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente decretou fal\u00eancia e est\u00e1 em processo de fechamento de empresa, n\u00e3o tendo rela\u00e7\u00e3o com a performance da solu\u00e7\u00e3o. Sendo assim Pilar 1 e 2 \"Cliente\""], [16, "GLASSMAX COMPONENTES", "glassmax.rs@gmail.com", "18/06/2025", "17/03/2026", 272, 144.0, "Cliente", "Produto", "Decis\u00e3o interna", "Mudan\u00e7a de diretriz interna motivou cancelamento; hist\u00f3rico de problemas t\u00e9cnicos como agravante.", "Altera\u00e7\u00f5es internas na empresa", "-", "o cancelamento \u00e9 por motivos internos", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente alega que a decis\u00e3o de cancelar foi interna para mudan\u00e7a de diretriz, verificado nos atendimentos hist\u00f3ricos que o mesmo teve problemas t\u00e9cnicos atendidos pelo Suporte. Sendo assim Pilar 1 \"Cliente\" e Pilar 2 \"Produto\""], [17, "LIMA & SILVEIRA RADIOLOGIA", "odontoimagemitb@hotmail.com", "16/10/2025", "13/03/2026", 148, 109.0, "Cliente", "Cliente", "Decis\u00e3o interna", "Reestrutura\u00e7\u00e3o interna for\u00e7ou cancelamento; cliente elogiou o produto e o suporte recebido.", "Mudan\u00e7as internas na empresa", "-", "Sistema de voc\u00eas \u00e9 \u00f3timo", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Verificado que o cliente passar\u00e1 por mudan\u00e7as internas e identificou a necessidade de cancelar. Alegou que n\u00e3o tem nenhuma rela\u00e7\u00e3o com o produto, elogiou a pontua. Recebeu suporte corretamente. Sendo assim Pilar 1 e 2 \"Cliente\""], [18, "LOCSYSTEMS SOLU\u00c7\u00d5ES", "xperia.lola@gmail.com", "03/12/2025", "13/03/2026", 100, 109.0, "Venda", "Venda", "N\u00e3o engajou / sem uso", "Desist\u00eancia pr\u00e9-treinamento; necessidade tempor\u00e1ria de registro de ponto j\u00e1 n\u00e3o existia mais.", "Necessidade tempor\u00e1ria conclu\u00edda", "-", "Nada", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente desistiu da solu\u00e7\u00e3o antes de realizar o treinamento, alegando que a necessidade tempor\u00e1ria n\u00e3o existe mais. Por ser uma desist\u00eancia na \u00e1rea comercial Pilar 1 e 2 \"Venda\""], [19, "MARFFE MOBILI", "operacional@marffemobili.com.br", "05/01/2026", "11/03/2026", 65, 109.0, "Venda", "Cliente", "N\u00e3o engajou / sem uso", "Desist\u00eancia p\u00f3s-treinamento sem uso efetivo; redu\u00e7\u00e3o de custos como justificativa declarada.", "Redu\u00e7\u00e3o de custos", "Nenhuma", "No momento pra gente, nada.", "N\u00e3o", "Sim", "An\u00e1lise Investigativa: Cliente desistiu da solu\u00e7\u00e3o ap\u00f3s realizar o treinamento conforme Hubspot, n\u00e3o tem uso no CS Backoffice, solicitou o cancelamento sem possibilidade de revers\u00e3o por desist\u00eania, alegou redu\u00e7\u00e3o de custo. Sendo assim Pilar 1 \"Clinete\" e Pilar 2 \"Venda\""], [20, "CLINICA NOVA IMAGEM JATAI", "novaimagemjatai.go@gmail.com", "28/01/2026", "10/03/2026", 41, 149.9, "Venda", "Venda", "Venda inadequada", "Venda inadequada: comercial prometeu integra\u00e7\u00e3o autom\u00e1tica com REP que o produto n\u00e3o suporta.", "Proposta apresentada diverge do que foi vendido", "No ato do treinamento foi pontuado ter que usar pen drive para importar as informa\u00e7\u00f5es ou ter custo com aquisi\u00e7\u00e3o de tablet\u00b4s sendo que temos o aparelho que atende a necessidade do sistema e da empresa em conjunto.", "Adicionar funcionalidades espec\u00edficas", "Sim", "Sim", "An\u00e1lise Investigativa: Durante o treinamento com o Lucas, a cliente informou que o comercial vendeu com a informa\u00e7\u00e3o de que podia registrar o ponto no REP e automaticamente vinha as informa\u00e7\u00f5es no sistema Pontua. A mesma falou que n\u00e3o quer fazer manualmente, registrar no REP e passar para a Pontua atrav\u00e9s do pen drive e falou que n\u00e3o vai mais utilizar. Sendo assim Pilar 1 e 2 \"Venda\""], [21, "CLEBSON DE ARRUDA", "esquadriasprimer@gmail.com", "06/02/2026", "06/03/2026", 28, 144.0, "Produto", "Venda", "Produto n\u00e3o atendeu", "Uso aut\u00f4nomo mal conduzido sem recurso ao suporte; dificuldades t\u00e9cnicas n\u00e3o relatadas formalmente.", "Necessidade tempor\u00e1ria conclu\u00edda", "Todas", "Melhorar a experi\u00eancia de uso", "Sim", "Sim", "An\u00e1lise Investigativa: N\u00e3o h\u00e1 registro de que o cliente tenha recorrido ao suporte para sanar as suas d\u00favidas. A experi\u00eancia de uso que o mesmo teve foi aut\u00f4noma e de alguma maneira n\u00e3o teve uma boa experi\u00eancia de uso, informou que teve todas as dificuldades poss\u00edveis. Sendo assim Pilar 1 e 2 \"Produto\""], [22, "VALORI COMERCIO", "valoriveiculos@gmail.com", "24/07/2025", "06/03/2026", 225, 59.9, "Suporte", "Produto", "Falha no suporte", "Inadimpl\u00eancia gerou bloqueio; reten\u00e7\u00e3o tentada, mas prazo de novo treinamento inviabilizou revers\u00e3o.", "N\u00e3o atende \u00e0s minhas necessidades", "Tive dificuldades em usar, nao tive dificuldade em acessar o sistema. Nem cheguei registrar ponto de nenhum funcion\u00e1rio, parei de realizar pagamento por nao estar conseguindo. Por falta de pagamento a\u00ed que nao tive mais acesso ao sistema mesmo, mesmo sem usar continuaram cobrando todos os meses. Tentei renegociar de forma justa, o novo treinamento s\u00f3 teria depois de dias distantes \u00e0 minha necessidade. Tentei renegociar algo justo ainda mais por nunca ter usado, mas sem sucesso.", "Reduzir o pre\u00e7o", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente n\u00e3o estava usando inicialmente e n\u00e3o pagou as faturas, devido a inadimpl\u00eancia foi bloqueada, entrou na lista de Reten\u00e7\u00e3o e conseguimos resgat\u00e1-lo convencendo a realizar outro treinamento para uso, por\u00e9m cliente n\u00e3o quis esperarm a data de disponibilidade e demonstrando pouca disposi\u00e7\u00e3o para prosseguir, optou pelo cancelamento. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Suporte\""], [23, "DOUGLAS PAZNEAUSKI", "dpazneauski@gmail.com", "25/03/2025", "26/02/2026", 338, 229.0, "Suporte", "Produto", "Falha no suporte", "Cancelamento ignorado por 9 dias pelo suporte; instabilidade do produto como causa central.", "Necessidade tempor\u00e1ria conclu\u00edda", "Instabilidade e suporte", "Melhorar o suporte", "Sim", "Sim", "An\u00e1lise Investigativa: Cliente n\u00e3o tem hist\u00f3rico registrado de recorr\u00eancia ao suporte por dificuldades no uso da plataforma. Solicitou o cancelamento h\u00e1 aproximadamente 9 dias e n\u00e3o houve retorno quanto a sua solicita\u00e7\u00e3o.  Externou que o produto apresentoiu muitos problemas e que o Suporte n\u00e3o foi adequado para permanecer. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Atendimento\""], [24, "SERVITEC SERVICOS", "servitec1303@gmail.com", "07/01/2026", "27/02/2026", 51, 79.9, "Produto", "Produto", "Instabilidade do produto", "Instabilidade sist\u00eamica nos 6 dias anteriores ao cancelamento; produto n\u00e3o atendeu necessidade operacional.", "N\u00e3o atende \u00e0s minhas necessidades", "bugando direto", "Adicionar funcionalidades espec\u00edficas", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente entrou em contato com o Suporte muito insatisfeita com a instabilidade do sistema e com as corre\u00e7\u00f5es pontuais que teve que realizar nos \u00faltimos 6 dias antes de decidir pelo cancelamento. Sendo assim Pilar 1 e 2 \"Produto\""], [25, "R R S SERVICOS", "kalebecaldas@iaamazonas.com.br", "04/08/2025", "27/02/2026", 207, 239.35, "Produto", "Concorr\u00eancia", "Migra\u00e7\u00e3o para concorrente", "Migra\u00e7\u00e3o silenciosa para concorrente sem registro de atendimentos ou reclama\u00e7\u00f5es formais.", "N\u00e3o atende \u00e0s minhas necessidades", "asdasdasd", "-", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cliente n\u00e3o apresentou problemas no Suporte t\u00e9cnico de maneira direta. Teve algumas dificuldades iniciais que foram atendidas. Em \u00faltimas ocorr\u00eancias j\u00e1 tinha migrado para a concocrrente (Ponto) em seguida solicitou o cancelamento. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [26, "AG - CARGAS E TERCEIRIZACAO DE SERVICOS LTDA", "ag@agservi.com.br", "19/01/2026", "27/02/2026", 39, 286.25, "Produto", "Produto", "Produto n\u00e3o atendeu", "Produto n\u00e3o atendeu \u00e0s necessidades operacionais; sem detalhes adicionais registrados.", "N\u00e3o atende \u00e0s minhas necessidades", "", "", "", "", ""], [27, "CONNECTRONIC SERVICOS LTDA", "marcos@exo.net.br", "14/01/2026", "27/02/2026", 44, 301.6, "Produto", "Produto", "Produto n\u00e3o atendeu", "Produto n\u00e3o atendeu \u00e0s necessidades operacionais; sem detalhes adicionais registrados.", "N\u00e3o atende \u00e0s minhas necessidades", "", "", "", "", ""], [28, "DIANA RODIGHERI", "proprojetos.xxe@gmail.com", "19/12/2025", "24/02/2026", 67, 144.0, "Venda", "Venda", "N\u00e3o engajou / sem uso", "Cliente nunca utilizou o produto; aus\u00eancia de engajamento deixou cancelamento na al\u00e7ada comercial.", "Contabilidade ser\u00e1 respons\u00e1vel", "", "-", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cliente nunca usuou o produto, n\u00e3o compareceu aos treinamentos e nunca retonou as mensagens enviadas, ficando o tr\u00e2mite na al\u00e7ada do comercial. Sendo assim Pilar 1 e 2 \"Venda\"."], [29, "EVERTON ROBERTO", "libertyinterioresoficial@gmail.com", "15/04/2025", "19/02/2026", 310, 59.9, "Suporte", "Suporte", "Falha no suporte", "Informa\u00e7\u00e3o incorreta do suporte sobre portaria 671 MTE gerou inseguran\u00e7a jur\u00eddica e cancelamento.", "N\u00e3o atende \u00e0s minhas necessidades", "", "-", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cleinte entrou em contato com o Suporte solicitando informa\u00e7\u00e3o se a Pontua trabalha com a portaria 671 MTE, Hor\u00e1cio informou que n\u00e3o sabe responder, passou para o atendimento Humano com o Thiago G\u00f3es, e o mesmo refor\u00e7ou que realmente n\u00e3o trabalha, informa\u00e7\u00e3o que tamb\u00e9m consta no Copilot da IA, o que \u00e9 uma informa\u00e7\u00e3o incorreta, cliente contratou outra solu\u00e7\u00e3o que j\u00e1 foi implantada. PIlar Atendimento"], [30, "ASEC", "asec.comunitaria@gmail.com", "10/09/2025", "12/02/2026", 155, 1669.9, "Cliente", "Produto", "Decis\u00e3o interna", "Parceria p\u00fablica com prefeitura substituiu a solu\u00e7\u00e3o; incompatibilidade de dispositivos como agravante.", "Encontrei uma solu\u00e7\u00e3o melhor", "Logistica de localiza\u00e7\u00e3o, aparelhos celulares incompat\u00edveis", "-", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente solicitou o cancelamento devido a ter encontrado uma solu\u00e7\u00e3o parceria com a prefeitura. Alegou n\u00e3o ser problema com a Pontua, em atendimento sempre foi socorrido com celeridade. Demonstrou algumas insatista\u00e7\u00f5es com instabilidade na plataforma que geraram muito atrito e retrabalho e problemas com celulares incompat\u00edveis. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Cliente\""], [31, "DAVISON JOSE LINO", "mlmanutencoes@gmail.com", "22/01/2026", "05/02/2026", 14, 109.0, "Produto", "Venda", "Produto n\u00e3o atendeu", "Complexidade de configura\u00e7\u00e3o pr\u00e9-treinamento desmotivou o cliente antes do primeiro uso.", "N\u00e3o atende \u00e0s minhas necessidades", "Muita burocracia", "Melhorar a experi\u00eancia de uso", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente nunca usou a solu\u00e7\u00e3o, alegou dificuldades ainda em etapa antes do Treinamento, se incomodando com a quantidade de configura\u00e7\u00f5es e investimento de tempo para configurar e fazer a manuten\u00e7\u00e3o, desistiu da ativa\u00e7\u00e3o. Sendo assim o Pilar 1  \"Venda\" e Pilar 2 \"Produto\""], [32, "PRIVATE CONSULTORIA", "rafael@privateseguros.com.br", "20/08/2025", "02/02/2026", 166, 79.9, "Produto", "Venda", "Produto n\u00e3o atendeu", "Excesso de lan\u00e7amentos e ajustes manuais incompat\u00edvel com disponibilidade de tempo do cliente.", "N\u00e3o atende \u00e0s minhas necessidades", "muitos lancamentos a serem feitos, acertos, ajustes que nao tenha tempo de ficar fazendo.", "Adicionar funcionalidades espec\u00edficas", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente n\u00e3o entrou em contato com o atendimento para pedir suporte, alegou em formul\u00e1rio complexidade de manuseio e alguns problemas para registrar o ponto, al\u00e9m de funcionalidades espec\u00edficas para facilitar. Sendo assim Pilar 1 e 2 \"Produto\""], [33, "FOKO CONTABILIDADE", "contato@fokocontabilidade.com.br", "05/06/2025", "30/01/2026", 239, 79.9, "Cliente", "Pre\u00e7o", "Decis\u00e3o interna", "Necessidade de controle de ponto encerrada; pre\u00e7o elevado refor\u00e7ou decis\u00e3o de cancelamento.", "Necessidade tempor\u00e1ria conclu\u00edda", "Nenhuma dificuldade.", "Reduzir o pre\u00e7o", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: Cleinte n\u00e3o apresentou dificuldades no uso da plataforma, nos registros a mesma alega que n\u00e3o tem mais a necessidade de utilizar a solu\u00e7\u00e3o. Citaram tamb\u00e9m o pre\u00e7o elevado como ponto de melhoria. Foi prestado todo o suporte necess\u00e1rio no per\u00edodo que esteve conosco. Sendo assim Pilar 1 \"Cliente\" e Pilar 2 \"Pre\u00e7o\""], [34, "LAUTON SERRALHERIA", "lauton_serralheria@hotmail.com", "12/01/2026", "28/01/2026", 16, 109.0, "Produto", "Suporte", "Instabilidade do produto", "Falhas desde a ativa\u00e7\u00e3o: ponto offline/online inst\u00e1vel e tablet incompat\u00edvel inviabilizaram o uso.", "Problemas t\u00e9cnicos ou bugs", "Problemas para bater o ponto pelo celular online e offline, n\u00e3o conseguir acessar o sistema do ponto pelo tablet, problemas com a localiza\u00e7\u00e3o do ponto n\u00e3o permitindo bater o ponto no hor\u00e1rio certo.", "Melhorar o suporte", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Segue a VoC \"Desde o in\u00edcio da utiliza\u00e7\u00e3o, estamos enfrentando diversos problemas no registro de ponto, tanto no modo offline quanto no online. Ressalto que, com apenas uma semana de uso, o sistema j\u00e1 apresentou falhas que v\u00eam comprometendo o controle correto da jornada dos colaboradores. Como exemplo, hoje de manh\u00e3 o colaborador n\u00e3o conseguiu registrar o ponto da entrada, pois o sistema indicava que ele se encontrava em seu endere\u00e7o residencial, quando na realidade j\u00e1 estava na empresa. Situa\u00e7\u00f5es como essa t\u00eam gerado diverg\u00eancias e inseguran\u00e7a nas marca\u00e7\u00f5es. Adquirimos inclusive um tablet exclusivamente para utiliza\u00e7\u00e3o do ponto, por\u00e9m, at\u00e9 o momento, n\u00e3o conseguimos utilizar o sistema. Diante dessas falhas recorrentes, optamos pelo cancelamento do servi\u00e7o, a fim de evitar novos transtornos e inconsist\u00eancias. No momento, buscamos uma solu\u00e7\u00e3o mais simples e eficiente, que facilite o uso no dia a dia da empresa. Solicitamos, por gentileza, as orienta\u00e7\u00f5es para a finaliza\u00e7\u00e3o, bem como a confirma\u00e7\u00e3o da data efetiva do cancelamento.\" Analisado que cliente teve suporte sempre que necessitou, por\u00e9m dado aos problemas com instabilidade gerou uma impress\u00e3o ruim. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Atendimento\""], [35, "SUPREMO SALGADINHOS", "salgadinhosco@gmail.com", "14/11/2025", "26/01/2026", 73, 76.35, "Produto", "Concorr\u00eancia", "Migra\u00e7\u00e3o para concorrente", "Complexidade percebida do sistema levou \u00e0 migra\u00e7\u00e3o para concorrente apesar do suporte prestado.", "Migra\u00e7\u00e3o para outra solu\u00e7\u00e3o", "", "", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente externou insatisfa\u00e7\u00e3o quanto a complexidade do sistema, recebeu todo o suporte mas ainda assim optou por migrar para a concorr\u00eancia, segundo ele uma solu\u00e7\u00e3o melhor para a empresa. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [36, "TUBASPORT PROMOCOES", "escolafuteboltubasport@gmail.com", "11/12/2025", "20/01/2026", 40, 144.0, "Venda", "Venda", "Perfil n\u00e3o aderente", "Desist\u00eancia pr\u00e9-treinamento; empresa n\u00e3o estava estruturalmente preparada para adotar o produto.", "Necessidade tempor\u00e1ria conclu\u00edda", "", "", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: N\u00e3o h\u00e1 registro de solicita\u00e7\u00e3o de suporte ou qualquer outra intera\u00e7\u00e3o que pudesse ser mensurado, cliente desistiu da solu\u00e7\u00e3o antes de realizar o treinamento alegando que precisa preparar melhor a estrutura interna da empresa para poder voltar a falar conosco. Sendo assim Pilar 1 \"Venda\" e Pilar 2 \"Venda\""], [37, "WJ DA SILVA", "vanderleia@rtstransportes.com.br", "23/07/2025", "15/01/2026", 176, 176.9, "Produto", "Concorr\u00eancia", "Migra\u00e7\u00e3o para concorrente", "Experi\u00eancia de uso insatisfat\u00f3ria sem registro formal de atendimentos; migrou para concorrente.", "Encontrei uma solu\u00e7\u00e3o melhor", "", "Melhorar a experi\u00eancia de uso", "N\u00e3o", "N\u00e3o", "An\u00e1lise Investigativa: N\u00e3o h\u00e1 registro de solicita\u00e7\u00e3o de suporte ou qualquer outra intera\u00e7\u00e3o que pudesse ser mensurado, n\u00e3o h\u00e1 pedido de cancelamento registrado no intercom apenas de ter sido cadastrado no Typeform, que mostra que cliente contratou uma solu\u00e7\u00e3o que considera melhor e colocou que a experi\u00eancia de uso foi o determinante. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [38, "ODONTOLOGIA NOBRE", "draalannamarina@gmail.com", "06/11/2025", "07/01/2026", 62, 79.9, "Produto", "Concorr\u00eancia", "Instabilidade do produto", "Falhas recorrentes com tela branca e registro de ponto impulsionaram migra\u00e7\u00e3o para concorrente.", "Problemas t\u00e9cnicos ou bugs", "A funcion\u00e1rias n\u00e3o conseguiam bater o ponto.  Sempre saia ou ficava a\u00ed tudo branco", "Melhorar a experi\u00eancia de uso", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente tem registros de contato com o suporte alegando diversos problemas com a aplica\u00e7\u00e3o como tela branca e outras ocorr\u00eancias que tem gerado retrabalho e desgastes. Solicitou o cancelamento por ter contratato outra solu\u00e7\u00e3o, que segundo ela \u00e9 melhor. Sendo assim Pilar 1 \"Produto\" e Pilar 2 \"Concorr\u00eancia\""], [39, "CAROLDO PRESTACAO", "caroldo_tr@hotmail.com", "24/02/2025", "07/01/2026", 317, 0.0, "Cliente", "Produto", "Decis\u00e3o interna", "Reestrutura\u00e7\u00e3o interna da empresa motivou cancelamento; dificuldades de uso registradas como agravante.", "Condi\u00e7\u00f5es atuais \u2014 cancelamento", "", "Melhorar a experi\u00eancia de uso", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente que deseja cancelar por n\u00e3o fazer mais sentido para a empresa, que v\u00e3o se reorganizar internamente, sinalizou tamb\u00e9m que h\u00e1 a necessidade de melhorar a experi\u00eancia de uso da plataforma, pois teve dificuldades no per\u00edodo. Foi atendido pelo suporte sempre que teve necessidade. Sendo assim Pilar 1 \"Cliente e Pilar 2  Produto."], [40, "PAXCAR AGENCIA", "financeiro@paxcartransportes.com", "05/08/2025", "06/01/2026", 154, 109.0, "Produto", "Produto", "Produto n\u00e3o atendeu", "Produto n\u00e3o atendeu expectativas sem que o cliente recorresse ao suporte durante toda a jornada.", "N\u00e3o atende \u00e0s minhas necessidades", ".", "Adicionar funcionalidades espec\u00edficas", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente registrou o cancelamento no Typeform, por\u00e9m n\u00e3o passou pelo suporte e nem entrou em contato para pedir apoio ao longo da sua jornada. Pelos motivos relatados o produto n\u00e3o atendeu as suas expectativas. Pilar Produto."], [41, "O.P. DE OLIVEIRA JUNIOR", "bedinaudio@hotmail.com", "29/07/2025", "05/01/2026", 160, 79.9, "Produto", "Venda", "Instabilidade do produto", "Funcionalidades prometidas na venda n\u00e3o funcionaram na pr\u00e1tica; bot\u00e3o offline com falhas cr\u00edticas.", "N\u00e3o atende \u00e0s minhas necessidades", "MUITAS, PROMETE A FUNCIONALIDADE MAIS NA PRATICA N\u00c3O FUNCIONA", "Adicionar funcionalidades espec\u00edficas", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Cliente registrou passou por problemas de funcionalidade registradas pelo suporte, caso foi analisado e por alguns desgastes cliente decidiu cancelar, pois o bot\u00e3o para batida off line estava apresentando problemas e disse que os funcion\u00e1rios nem estavam usando, tendo que voltar para o registro manual."], [42, "LR INFORMATICA", "lucianobatista.ti@gmail.com", "30/10/2025", "05/01/2026", 67, 92.65, "Cliente", "Cliente", "Decis\u00e3o interna", "Empresa deixou de ser obrigada ao ponto eletr\u00f4nico; cancelamento por obsolesc\u00eancia da necessidade.", "Necessidade tempor\u00e1ria conclu\u00edda", "", "Melhorar a experi\u00eancia de uso", "Sim", "N\u00e3o", "An\u00e1lise Investigativa: Analisando os atendimentos do cliente, o mesmo alega que n\u00e3o est\u00e3o mais utilizando o ponto obrigat\u00f3rio, n\u00e3o fazendo sentido mais utilizar o ponto."]]};
+
+Chart.register(ChartDataLabels);
+
+// ── TABS ──────────────────────────────────────────────────────
+function showTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────
+document.getElementById('fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));
+function handleFile(file){
+  if(!file)return;
+  document.getElementById('fiName').textContent=file.name;
+  document.getElementById('fi').classList.add('show');
+  const reader=new FileReader();
+  reader.onload=e=>parseAll(e.target.result);
+  reader.readAsArrayBuffer(file);
+}
+function resetFile(){
+  document.getElementById('fi').classList.remove('show');
+  document.getElementById('fileInput').value='';
+  ['churn','diag','pilar','base'].forEach(n=>{
+    document.getElementById(n+'Content').style.display='none';
+    document.getElementById(n+'Ph').style.display='block';
+  });
+}
+
+
+// ── UTILS ─────────────────────────────────────────────────────
+const gC='rgba(0,0,0,0.05)',tC='#8a8a85';
+const bO={responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},datalabels:{display:false}},
+  scales:{x:{ticks:{color:tC,font:{size:11}},grid:{color:gC}},
+          y:{ticks:{color:tC,font:{size:11}},grid:{color:gC}}}};
+let CH={};
+function dC(id){if(CH[id]){CH[id].destroy();delete CH[id];}}
+function fP(v){return(v*100).toFixed(2)+'%';}
+function fB(v){return'R$ '+Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fI(v){return Number(v).toLocaleString('pt-BR');}
+function pC(v){return v<0.015?'ps':v<0.03?'pw':'pd';}
+function kB(v){return v<0.015?'ks2':v<0.03?'kw':'kd';}
+function kK(v){return v<0.015?'cs':v<0.03?'cw':'cd';}
+function bColor(v){return v<0.015?'#16a34a':v<0.03?'#d97706':'#dc2626';}
+function pillarPill(p){
+  const m={Produto:'ppr',Venda:'pve',Cliente:'pcl',Suporte:'pat',Atendimento:'pat',
+    'Preço':'ppc','Concorrência':'pi','Concorr\u00eancia':'pi'};
+  const s=String(p||'');
+  return`<span class="pill ${m[s]||'pi'}">${s||'—'}</span>`;
+}
+function pillarColor(p){
+  return{Produto:'#7c3aed',Venda:'#ea580c',Cliente:'#0891b2',
+    Suporte:'#d97706',Atendimento:'#d97706','Preço':'#16a34a','Concorrência':'#0891b2','Concorr\u00eancia':'#0891b2'}[p]||'#888';
+}
+const dlBase={display:true,color:'#555',font:{size:11,weight:'500',family:"'DM Mono',monospace"},anchor:'end',align:'top',offset:3};
+
+// ── CHURN ─────────────────────────────────────────────────────
+
+// ── DIAGNÓSTICO ───────────────────────────────────────────────
+
+// ── PILARES ───────────────────────────────────────────────────
+
+// ── BASE 2026 ─────────────────────────────────────────────────
+let _baseRows=[], _baseHeaders=[];
+function exportBase(format){
+  if(!_baseRows.length){alert('Carregue o arquivo primeiro.');return;}
+  if(format==='csv'){
+    const esc=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    const lines=[_baseHeaders.map(esc).join(','),
+      ..._baseRows.map(r=>r.map(esc).join(','))];
+    const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+    a.download='Pontua_Base_Cancelamentos_2026.csv';a.click();
+  } else {
+    const ws=XLSX.utils.aoa_to_sheet([_baseHeaders,..._baseRows]);
+    const wb2=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb2,ws,'Base 2026');
+    XLSX.writeFile(wb2,'Pontua_Base_Cancelamentos_2026.xlsx');
+  }
+}
+
+function parseAll(buf){
+  const wb=XLSX.read(buf,{type:'arraybuffer',cellDates:true});
+  const n=s=>wb.Sheets[s];
+  const wsM=n('Mensal'); if(wsM) parseChurnFromSheet(wsM);
+  const wsP=n('An\u00e1lise por Pilar'); if(wsP) parsePilaresFromSheet(wsP);
+  const wsD=n('Diagn\u00f3stico'); if(wsD) parseDiagFromSheet(wsD,wsP);
+  const wsB=n('Base 2026'); if(wsB) parseBase(wsB);
+}
+
+function parseChurnFromSheet(ws){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  const mPT=['janeiro','fevereiro','mar\u00e7o','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const dr=rows.filter(r=>r[1]&&typeof r[1]==='string'&&mPT.includes(r[1].toLowerCase().trim()));
+  if(!dr.length)return;
+  const data=[];
+  dr.forEach(r=>{
+    const bi=+(r[2]||0),ca=+(r[4]||0),ve=+(r[3]||0),mr=+(r[8]||0);
+    const churnMrr=+(r[7]||0),mrrBase=+(r[10]||0);
+    data.push({mes:r[1],baseIn:bi,vendidos:ve,cancel:ca,baseFim:bi+ve-ca,churnMes:bi?ca/bi:0,mrr:mr,churn_mrr:churnMrr,mrr_base:mrrBase});
+  });
+  // totals row (label "Total/Média")
+  const totRow=rows.find(r=>r[1]&&String(r[1]).includes('Total'));
+  const medChurn=totRow?+(totRow[6]||0):0.027904;
+  const medChurnMrr=totRow?+(totRow[7]||0):0.022044;
+  const medMrr=totRow?+(totRow[8]||0):2441.00;
+  const medBase=totRow?+(totRow[10]||0):106559.32;
+  const b0=data[0].baseIn;let ac=0,mac=0;
+  data.forEach(d=>{ac+=d.cancel;mac+=d.mrr;d.churnAcum=b0?ac/b0:0;d.mrrAcum=mac;});
+  renderChurnFromData(data,medChurn,medChurnMrr,medMrr,medBase);
+}
+
+function parseDiagFromSheet(ws,wsPilares){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  const PILARES=['Produto','Cliente','Venda','Suporte','Pre\u00e7o'];
+  const pilarArr=[],sugArr=[];
+  rows.forEach(r=>{
+    const lbl=String(r[1]||'').trim();
+    if(PILARES.includes(lbl)&&typeof r[2]==='number') pilarArr.push({name:lbl,qtd:r[2],pct:+(r[3]||0),diag:String(r[4]||'')});
+  });
+  // sugestoes
+  let inSug=false;
+  rows.forEach(r=>{
+    const lbl=String(r[1]||'').trim();
+    if(lbl.includes('SUGEST')) {inSug=true;return;}
+    if(inSug&&lbl&&lbl!=='Sugestão'&&typeof r[2]==='number') sugArr.push({sug:lbl,qtd:r[2],pct:+(r[3]||0)});
+  });
+  const subMot=[];
+  if(wsPilares){
+    const pr=XLSX.utils.sheet_to_json(wsPilares,{header:1,defval:null});
+    pr.forEach(r=>{
+      const lbl=String(r[1]||'').trim();
+      if(lbl.includes('\u2193')&&typeof r[2]==='number') subMot.push([lbl.replace('\u2193','').trim(),'',+(r[3]||0)]);
+    });
+  }
+  renderDiagFromData(pilarArr,sugArr,subMot);
+}
+
+function parsePilaresFromSheet(ws){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null});
+  const pilaresArr=[];let current=null;
+  rows.forEach(r=>{
+    const lbl=String(r[1]||'').trim();
+    const isHdr=lbl.includes('\u00b7')&&typeof r[2]==='number';
+    if(isHdr){
+      const nm=lbl.split('\u00b7')[0].trim();
+      const n2=nm.charAt(0)+nm.slice(1).toLowerCase();
+      current={name:n2,rawKey:nm.toUpperCase(),qtd:+(r[2]||0),pct:+(r[3]||0),diag:String(r[4]||''),motivos:[]};
+      pilaresArr.push(current);
+    } else if(lbl.includes('\u2193')&&current&&typeof r[2]==='number'){
+      current.motivos.push({label:lbl.replace('\u2193','').trim(),qtd:+(r[2]||0),pct:+(r[3]||0),diag:String(r[4]||'')});
+    }
+  });
+  renderPilaresFromData(pilaresArr);
+}
+
+function parseBase(ws){
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:null,cellDates:true});
+  let hi=-1;
+  for(let i=0;i<Math.min(rows.length,8);i++){
+    if(rows[i].some(c=>String(c||'').replace(/\n/g,' ').trim()==='N\u00ba'||String(c||'').replace(/\n/g,' ').trim()==='Empresa')){hi=i;break;}
+  }
+  if(hi<0)hi=3;
+  const hdrs=rows[hi].map(h=>String(h||'').replace(/\n/g,' ').toLowerCase().trim());
+  function fc(...kws){return hdrs.findIndex(h=>kws.some(k=>h.includes(k.toLowerCase())));}
+  const cN=fc('n\u00ba','n\u00b0'),cEmp=fc('empresa'),cMail=fc('e-mail','email');
+  const cDtA=fc('ativa\u00e7\u00e3o','ativacao'),cDtC=fc('cancelamento');
+  const cTmp=fc('tempo de base'),cMRR=fc('mrr');
+  let cP1=fc('pilar 1');const cP2=fc('pilar 2');if(cP1<0&&cP2>0)cP1=cP2-1;
+  const cMC=fc('motivo do','cliente central','motivo central');
+  const cSint=fc('s\u00edntese','sintese','causa raiz');
+  const cMot=fc('motivo principal'),cDet=fc('detalhes'),cSug=fc('sugest\u00e3o','sugestao');
+  const cTec=fc('dif.'),cRet=fc('reten\u00e7\u00e3o','retencao'),cAnal=fc('an\u00e1lise investigativa','analise investigativa');
+  const dr=rows.slice(hi+1).filter(r=>{const v=r[cN>=0?cN:1];return v!=null&&!isNaN(+v)&&+v>0;});
+  function gv(r,c){return c>=0?r[c]:null;}
+  function dt(v){if(!v)return'\u2014';if(v instanceof Date)return v.toLocaleDateString('pt-BR');if(typeof v==='string'&&(v.includes('/')||v.includes('-')))return v.substring(0,10);return'\u2014';}
+  _baseHeaders=['N\u00ba','Empresa','E-mail','Data Ativa\u00e7\u00e3o','Data Cancelamento','Tempo de Base (Dias)','MRR (R$)','Pilar 1','Pilar 2','Motivo Central','S\u00edntese da Causa Raiz','Motivo Principal','Detalhes T\u00e9cnicos','Sugest\u00e3o de Melhoria','Dif. T\u00e9cnica?','Passou Reten\u00e7\u00e3o?','An\u00e1lise Investigativa'];
+  _baseRows=dr.map(r=>[gv(r,cN),gv(r,cEmp),gv(r,cMail),dt(gv(r,cDtA)),dt(gv(r,cDtC)),gv(r,cTmp),gv(r,cMRR),gv(r,cP1),gv(r,cP2),gv(r,cMC),gv(r,cSint),gv(r,cMot),gv(r,cDet),gv(r,cSug),gv(r,cTec),gv(r,cRet),gv(r,cAnal)]);
+  renderBaseArr(_baseRows);
+}
+
+function renderChurnFromData(data,medChurn,medChurnMrr,medMrr,medBase){
+  medChurn=medChurn||data.reduce((s,d)=>s+d.churnMes,0)/data.length;
+  medChurnMrr=medChurnMrr||data.reduce((s,d)=>s+(d.churn_mrr||0),0)/data.length;
+  medMrr=medMrr||data.reduce((s,d)=>s+d.mrr,0)/data.length;
+  medBase=medBase||data.reduce((s,d)=>s+(d.mrr_base||0),0)/data.length;
+  const b0=data[0].baseIn,totC=data.reduce((s,d)=>s+d.cancel,0);
+  const totM=data.reduce((s,d)=>s+d.mrr,0),last=data[data.length-1];
+  const tkt=totC?totM/totC:0,liq=last.baseFim-b0,labels=data.map(d=>d.mes);
+  document.getElementById('churnMeta').innerHTML=`Base inicial: ${data[0].mes} (${fI(b0)} contratos) \u00b7 ${data.length} meses`;
+  document.getElementById('kpiGrid').innerHTML=`
+    <div class="kpi ${kB(medChurn)}"><div class="kl">Churn M\u00e9dio Mensal</div><div class="kv ${kK(medChurn)}">${(medChurn*100).toFixed(2)}%</div><div class="ks">m\u00e9dia dos ${data.length} meses</div></div>
+    <div class="kpi ${kB(medChurnMrr)}"><div class="kl">Churn MRR M\u00e9dio</div><div class="kv ${kK(medChurnMrr)}">${(medChurnMrr*100).toFixed(2)}%</div><div class="ks">MRR cancel. / MRR base</div></div>
+    <div class="kpi kd"><div class="kl">MRR Cancel. M\u00e9dio Mensal</div><div class="kv cd">${fB(medMrr)}</div><div class="ks">m\u00e9dia mensal</div></div>
+    <div class="kpi kw"><div class="kl">Ticket M\u00e9dio Cancel.</div><div class="kv cw">${fB(tkt)}</div><div class="ks">por contrato cancelado</div></div>
+    <div class="kpi ks2"><div class="kl">MRR Base Total M\u00e9d.</div><div class="kv cs">${fB(medBase)}</div><div class="ks">m\u00e9dia da base ativa</div></div>`;
+  let a2=0;
+  document.getElementById('mainTbody').innerHTML=data.map(d=>{a2+=d.cancel;const ac=b0?a2/b0:0;
+    return`<tr><td style="white-space:nowrap">${d.mes}</td><td>${fI(d.baseIn)}</td><td style="color:var(--ok)">+${d.vendidos}</td><td style="color:var(--dn)">-${d.cancel}</td><td>${fI(d.baseFim)}</td><td><span class="pill ${pC(d.churnMes)}">${fP(d.churnMes)}</span></td><td>${fB(d.mrr)}</td><td><span class="pill ${pC(ac)}">${fP(ac)}</span></td><td><span class="pill ${pC(d.churn_mrr||0)}">${((d.churn_mrr||0)*100).toFixed(2)}%</span></td><td style="text-align:right">${fB(d.mrr_base||0)}</td></tr>`;
+  }).join('')+`<tr class="tr-total"><td>Total/M\u00e9dia</td><td>${fI(b0)}</td><td style="color:var(--ok)">+${fI(data.reduce((s,d)=>s+d.vendidos,0))}</td><td style="color:var(--dn)">-${fI(totC)}</td><td>${fI(last.baseFim)}</td><td><span class="pill ${pC(medChurn)}">${(medChurn*100).toFixed(2)}% med.</span></td><td>${fB(medMrr)} med.</td><td><span class="pill ${pC(last.churnAcum)}">${fP(last.churnAcum)} ac.</span></td><td><span class="pill ${pC(medChurnMrr)}">${(medChurnMrr*100).toFixed(2)}% med.</span></td><td style="text-align:right">${fB(medBase)} med.</td></tr>`;
+  const dlB={display:true,font:{size:11,weight:'700',family:"'DM Mono',monospace"},anchor:'end',align:'top',offset:2};
+  dC('cMedio');CH.cMedio=new Chart(document.getElementById('cMedio'),{type:'bar',data:{labels,datasets:[
+    {type:'line',data:data.map(()=>+(medChurn*100).toFixed(2)),borderColor:'#2563eb',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',datalabels:{display:false}},
+    {type:'bar',data:data.map(d=>+(d.churnMes*100).toFixed(2)),backgroundColor:data.map(d=>bColor(d.churnMes)),borderRadius:4,datalabels:{...dlBase,color:data.map(d=>bColor(d.churnMes)),formatter:v=>v.toFixed(2)+'%'}},
+  ]},options:{...bO,scales:{...bO.scales,y:{...bO.scales.y,ticks:{...bO.scales.y.ticks,callback:v=>v+'%'}}},plugins:{...bO.plugins,datalabels:{display:true}},layout:{padding:{top:24}}}});
+  dC('cMrrChurn');CH.cMrrChurn=new Chart(document.getElementById('cMrrChurn'),{type:'bar',data:{labels,datasets:[
+    {type:'line',data:data.map(()=>+(medChurnMrr*100).toFixed(2)),borderColor:'#0e7490',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',datalabels:{display:false}},
+    {type:'bar',data:data.map(d=>+((d.churn_mrr||0)*100).toFixed(2)),
+      backgroundColor:data.map(d=>(d.churn_mrr||0)<0.025?'rgba(22,163,74,0.65)':(d.churn_mrr||0)<0.04?'rgba(217,119,6,0.72)':'rgba(220,38,38,0.85)'),
+      borderRadius:4,datalabels:{display:true,color:data.map(d=>(d.churn_mrr||0)<0.025?'#15803d':(d.churn_mrr||0)<0.04?'#b45309':'#b91c1c'),font:{size:11,weight:'700',family:"'DM Mono',monospace"},anchor:'end',align:'top',offset:2,formatter:v=>v.toFixed(2)+'%'}},
+  ]},options:{...bO,scales:{...bO.scales,y:{...bO.scales.y,beginAtZero:true,ticks:{...bO.scales.y.ticks,callback:v=>v+'%'}}},plugins:{...bO.plugins,datalabels:{display:true},legend:{display:false}},layout:{padding:{top:30}}}});
+  dC('cBase');CH.cBase=new Chart(document.getElementById('cBase'),{type:'bar',data:{labels,datasets:[
+    {label:'Base in\u00edcio',data:data.map(d=>d.baseIn),backgroundColor:'rgba(37,99,235,0.25)',borderRadius:4,datalabels:{...dlB,color:'#2563eb',formatter:fI}},
+    {label:'Base fim',data:data.map(d=>d.baseFim),backgroundColor:'#2563eb',borderRadius:4,datalabels:{...dlB,color:'#1d4ed8',formatter:fI}},
+  ]},options:{...bO,scales:{...bO.scales,y:{...bO.scales.y,min:Math.floor(Math.min(...data.map(d=>d.baseIn))*.94)}},
+    plugins:{...bO.plugins,datalabels:{display:true},legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:11},color:tC,
+      generateLabels:()=>[{text:'Base in\u00edcio',fillStyle:'rgba(37,99,235,0.25)',strokeStyle:'transparent',lineWidth:0},{text:'Base fim',fillStyle:'#2563eb',strokeStyle:'transparent',lineWidth:0}]}}},
+    layout:{padding:{top:28}}}});
+  dC('cMrr');CH.cMrr=new Chart(document.getElementById('cMrr'),{type:'bar',data:{labels,datasets:[{
+    data:data.map(d=>+d.mrr),
+    backgroundColor:data.map(d=>d.mrr>3000?'rgba(220,38,38,0.90)':d.mrr>2000?'rgba(220,38,38,0.72)':'rgba(220,38,38,0.50)'),
+    borderRadius:6,datalabels:{display:true,color:'#b91c1c',font:{size:11,weight:'700',family:"'DM Mono',monospace"},anchor:'end',align:'top',offset:2,
+      formatter:v=>'R$ '+Math.round(v).toLocaleString('pt-BR')}}]},
+    options:{...bO,scales:{...bO.scales,y:{...bO.scales.y,beginAtZero:true,ticks:{...bO.scales.y.ticks,callback:v=>'R$'+v.toLocaleString('pt-BR')}}},plugins:{...bO.plugins,datalabels:{display:true},legend:{display:false}},layout:{padding:{top:32}}}});
+  dC('cMensal');CH.cMensal=new Chart(document.getElementById('cMensal'),{type:'line',data:{labels,datasets:[{
+    data:data.map(d=>+(d.churnMes*100).toFixed(2)),borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.08)',tension:.35,fill:true,pointRadius:5,pointBackgroundColor:'#dc2626',
+    datalabels:{...dlBase,color:'#dc2626',formatter:v=>v.toFixed(2)+'%'}}]},
+    options:{...bO,scales:{...bO.scales,y:{...bO.scales.y,ticks:{...bO.scales.y.ticks,callback:v=>v+'%'}}},plugins:{...bO.plugins,datalabels:{display:true}},layout:{padding:{top:24}}}});
+  document.getElementById('churnPh').style.display='none';
+  document.getElementById('churnContent').style.display='block';
+}
+
+function renderDiagFromData(pilarArr,sugArr,subMotArr){
+  if(!pilarArr||!pilarArr.length)return;
+  const pN=pilarArr.map(p=>p.name),pQ=pilarArr.map(p=>+p.qtd),pP=pilarArr.map(p=>+p.pct);
+  const tot=pQ.reduce((s,v)=>s+v,0)||42;
+  document.getElementById('diagMeta').textContent=`${tot} cancelamentos \u00b7 Base 2026 \u00b7 Atualiza\u00e7\u00e3o: 31/03/2026`;
+  document.getElementById('diagKpi').innerHTML=`
+    <div class="kpi kd"><div class="kl">Total Cancelamentos</div><div class="kv cd"><button class="num-btn" onclick="filterBase('all','')">${tot}</button></div><div class="ks">clientes \u00b7 2026</div></div>
+    <div class="kpi kw"><div class="kl">Dificuldades T\u00e9cnicas</div><div class="kv cw"><button class="num-btn" onclick="filterBase('dif','Sim')">23</button></div><div class="ks">54,8% dos casos</div></div>
+    <div class="kpi ki"><div class="kl">Pilar Cr\u00edtico</div><div class="kv cp"><button class="num-btn" onclick="filterBase('pilar1','${pN[0]||''}')">${pN[0]||'\u2014'}</button></div><div class="ks">${fP(pP[0]||0)} dos cancelamentos</div></div>
+    <div class="kpi kd"><div class="kl">MRR Cancelado</div><div class="kv cd">R$ 7.323</div><div class="ks">Jan + Fev + Mar 2026</div></div>`;
+  const colors=pN.map(p=>pillarColor(p));
+  dC('cPilH');CH.cPilH=new Chart(document.getElementById('cPilH'),{type:'bar',data:{labels:pN,datasets:[{data:pQ,backgroundColor:colors,borderRadius:5,
+    datalabels:{display:true,color:colors,anchor:'end',align:'right',font:{size:12,weight:'500',family:"'DM Mono',monospace"},formatter:v=>v+' cancel.'}}]},
+    options:{...bO,indexAxis:'y',scales:{x:{ticks:{color:tC,font:{size:11}},grid:{color:gC}},y:{ticks:{color:tC,font:{size:12,weight:'500'}},grid:{display:false}}},plugins:{...bO.plugins,datalabels:{display:true}},layout:{padding:{right:90}}}});
+  dC('cPilD');CH.cPilD=new Chart(document.getElementById('cPilD'),{type:'doughnut',data:{labels:pN,datasets:[{
+    data:pP.map(v=>+(v*100).toFixed(1)),backgroundColor:colors,borderWidth:2,borderColor:'#fff',
+    datalabels:{display:true,color:'#fff',font:{size:11,weight:'600'},formatter:(v,ctx)=>v>0?pN[ctx.dataIndex].substring(0,4)+'\n'+v+'%':''}}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:10,font:{size:11},color:tC}},datalabels:{display:true}},layout:{padding:8}}});
+  const totalSug=(sugArr||[]).reduce((s,r)=>s+r.qtd,0)||1;
+  document.getElementById('subTbody').innerHTML=(subMotArr||[]).map((r,i)=>{const bg=i%2===0?'':'background:var(--sf2)';
+    return`<tr style="${bg}"><td><button class="num-btn" onclick="filterBase('mc','${r[0]}')">${r[0]}</button></td><td>${pillarPill(r[1])}</td><td><span class="pill pi">${fP(r[2])}</span></td></tr>`;
+  }).join('');
+  document.getElementById('sugTbody').innerHTML=(sugArr||[]).map((r,i)=>{const bg=i%2===0?'':'background:var(--sf2)';
+    return`<tr style="${bg}"><td>${r.sug}</td><td><button class="num-btn" onclick="filterBase('mc','${r.sug}')">${r.qtd}</button></td><td><span class="pill pi">${(r.qtd/totalSug*100).toFixed(1)}%</span></td></tr>`;
+  }).join('');
+  document.getElementById('diagPh').style.display='none';
+  document.getElementById('diagContent').style.display='block';
+}
+
+function renderPilaresFromData(arr){
+  if(!arr||!arr.length)return;
+  const tot=arr.reduce((s,p)=>s+(+p.qtd),0)||42;
+  document.getElementById('pilarMeta').textContent=`${tot} cancelamentos \u00b7 Pilar 1=Causa Raiz \u00b7 Pilar 2=Influenciador \u00b7 31/03/2026`;
+  const cC={PRODUTO:'pc-card-produto',VENDA:'pc-card-venda',CLIENTE:'pc-card-cliente',SUPORTE:'pc-card-atendimento','PRE\u00c7O':'pc-card-preco',PRECO:'pc-card-preco'};
+  const sL={PRODUTO:'Causa raiz principal',VENDA:'Desalinhamento comercial',CLIENTE:'Fatores externos',SUPORTE:'Momento cr\u00edtico','PRE\u00c7O':'Percep\u00e7\u00e3o de valor',PRECO:'Percep\u00e7\u00e3o de valor'};
+  document.getElementById('pilarCards').innerHTML=arr.map(p=>{
+    const rk=p.rawKey||p.name.toUpperCase(),pct=+((+p.qtd/tot)*100).toFixed(1),clr=pillarColor(p.name);
+    const mH=(p.motivos||[]).length?`<div class="pc-motivos-title">Motivos detalhados</div>${(p.motivos||[]).map(m=>`<div class="pc-motivo"><span class="pc-ml">${m.label}</span><div class="pc-mr"><span class="pc-mcount" style="color:${clr}"><button class="num-btn" onclick="filterBase('mc','${m.label}')">${m.qtd}</button></span><span class="pc-mpct">${fP(+m.pct)}</span></div></div>`).join('')}`:'';
+    return`<div class="pc-card ${cC[rk]||''}"><div class="pc-hdr"><div><div class="pc-name" style="color:${clr}">${p.name}</div><div class="pc-sub-name">${sL[rk]||''}</div></div><div style="text-align:right"><div class="pc-count" style="color:${clr}"><button class="num-btn" onclick="filterBase('pilar1','${p.name}')">${p.qtd}</button></div><div class="pc-pct-badge" style="background:${clr}15;color:${clr}">${pct}%</div></div></div><div class="pc-bar-bg"><div class="pc-bar" style="width:${pct}%;background:${clr}"></div></div><div class="pc-diag"><div style="font-size:9px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:${clr};margin-bottom:.35rem;opacity:.8">Escopo / Crit\u00e9rio avaliado</div>${p.diag}</div>${mH}</div>`;
+  }).join('');
+  let tb='';
+  arr.forEach(p=>{const clr=pillarColor(p.name);
+    tb+=`<tr style="background:${clr}12"><td>${pillarPill(p.name)}</td><td><button class="num-btn" onclick="filterBase('pilar1','${p.name}')">${p.qtd}</button></td><td><span class="pill ${pC(+p.pct)}">${fP(+p.pct)}</span></td><td style="text-align:left;white-space:normal;line-height:1.5"><div style="font-size:9px;font-weight:600;text-transform:uppercase;color:${clr};margin-bottom:.25rem;opacity:.85">Escopo</div><div style="font-size:12px;color:var(--tx)">${p.diag}</div></td></tr>`;
+    (p.motivos||[]).forEach(m=>{tb+=`<tr class="tr-sub"><td>\u2937 ${m.label}</td><td>${fP(+m.pct)}</td><td colspan="2" style="text-align:left;font-size:11px;color:var(--mu);white-space:normal;line-height:1.5">${m.diag}</td></tr>`;});
+  });
+  tb+=`<tr class="tr-total"><td>TOTAL GERAL</td><td>${tot}</td><td>100%</td><td style="text-align:left;font-size:12px">MRR perdido: R$ 7.323 \u00b7 Dif. t\u00e9cnicas: 23 (54,8%)</td></tr>`;
+  document.getElementById('pilarTbody').innerHTML=tb;
+  document.getElementById('pilarLegend').innerHTML=Object.entries({Produto:'var(--pr)',Cliente:'var(--cl)',Venda:'var(--ve)',Suporte:'var(--at)','Pre\u00e7o':'var(--pc)'}).map(([n,c])=>`<span class="lgi"><span class="lgd" style="background:${c}"></span>${n}</span>`).join('');
+  document.getElementById('pilarPh').style.display='none';
+  document.getElementById('pilarContent').style.display='block';
+}
+
+function renderBaseArr(arr){
+  if(!arr||!arr.length)return;
+  _baseHeaders=['N\u00ba','Empresa','E-mail','Data Ativa\u00e7\u00e3o','Data Cancelamento','Tempo de Base (Dias)','MRR (R$)','Pilar 1','Pilar 2','Motivo Central','S\u00edntese da Causa Raiz','Motivo Principal','Detalhes T\u00e9cnicos','Sugest\u00e3o de Melhoria','Dif. T\u00e9cnica?','Passou Reten\u00e7\u00e3o?','An\u00e1lise Investigativa'];
+  _baseRows=arr.map(r=>r.slice(0,17));
+  document.getElementById('baseMeta').textContent=`${arr.length} registros \u00b7 Jan\u2013Mar 2026 \u00b7 Atualiza\u00e7\u00e3o: 31/03/2026`;
+  document.getElementById('baseTbody').innerHTML=arr.map((r,i)=>{
+    const [n,emp,email,dtA,dtC,tempo,mrr,p1,p2,mc,sint,mot,det,sug,tec,ret,anal]=r;
+    const blank=v=>!v||String(v)==='-'||String(v)==='None'||String(v).trim()==='';
+    const tecCell=tec==='Sim'?'<span class="pill pi">Sim</span>':'<span style="color:var(--mu)">N\u00e3o</span>';
+    const retCell=ret==='Sim'?'<span class="pill ps">Sim</span>':ret==='N\u00e3o'?'<span class="pill pd">N\u00e3o</span>':'<span style="color:var(--mu)">\u2014</span>';
+    const bg=i%2===0?'':'background:var(--sf2)';
+    const empFmt=emp&&emp===emp.toUpperCase()&&emp.length>3?emp.charAt(0)+emp.slice(1).toLowerCase():emp||'\u2014';
+    const tempoFmt=tempo&&!isNaN(+tempo)?`${tempo} dias`:'\u2014';
+    return`<tr style="${bg}"><td class="td-num">${n}</td><td class="td-empresa">${empFmt}</td><td class="td-email" style="font-size:11px">${email||'\u2014'}</td><td class="td-center" style="white-space:nowrap;font-size:13px">${dtA||'\u2014'}</td><td class="td-center" style="white-space:nowrap;font-size:13px">${dtC||'\u2014'}</td><td class="td-center" style="color:var(--inf);white-space:nowrap;font-size:13px">${tempoFmt}</td><td style="text-align:right;white-space:nowrap;font-size:13px">${mrr?fB(+mrr):'\u2014'}</td><td class="td-center">${pillarPill(p1)}</td><td class="td-center">${pillarPill(p2)}</td><td class="td-mc">${blank(mc)?'\u2014':mc}</td><td class="td-sint">${blank(sint)?'<span style="color:var(--lt)">\u2014</span>':sint}</td><td class="td-motivo" style="font-size:13px">${blank(mot)?'\u2014':mot}</td><td class="td-det">${blank(det)?'<span style="color:var(--lt)">\u2014</span>':det}</td><td class="td-det">${blank(sug)?'<span style="color:var(--lt)">\u2014</span>':sug}</td><td class="td-center">${tecCell}</td><td class="td-center">${retCell}</td><td class="td-anal">${blank(anal)?'<span style="color:var(--lt)">\u2014</span>':anal}</td></tr>`;
+  }).join('');
+  document.getElementById('basePh').style.display='none';
+  document.getElementById('baseContent').style.display='block';
+  setTimeout(()=>{
+    const top=document.getElementById('baseScrollTop'),wrap=document.getElementById('baseWrap'),inner=document.getElementById('baseScrollTopInner');
+    if(!top||!wrap||!inner)return;
+    inner.style.width=wrap.scrollWidth+'px';
+    top.style.display=wrap.scrollWidth>wrap.clientWidth?'block':'none';
+    top.onscroll=()=>{wrap.scrollLeft=top.scrollLeft;};
+    wrap.onscroll=()=>{top.scrollLeft=wrap.scrollLeft;};
+  },200);
+}
+
+function filterBase(field,value){
+  const COLS=['N\u00ba','Empresa','E-mail','Data Ativa\u00e7\u00e3o','Data Cancelamento','Tempo de Base','MRR (R$)','Pilar 1','Pilar 2','Motivo Central','S\u00edntese da Causa Raiz','Motivo Principal','Detalhes T\u00e9cnicos','Sugest\u00e3o de Melhoria','Dif. T\u00e9cnica','Reten\u00e7\u00e3o','An\u00e1lise Investigativa'];
+  const CI={pilar1:7,pilar2:8,mc:9,dif:14,ret:15,all:-1},ci=CI[field]??-1,base=PONTUA_DATA.base||[];
+  const filtered=ci<0?base:base.filter(r=>String(r[ci]||'').trim()===value);
+  const PC={Produto:'#EDE7F6|#6D28D9',Venda:'#FBE9E7|#C2410C',Cliente:'#E0F7FA|#0E7490',Suporte:'#FFF8E1|#B45309','Pre\u00e7o':'#ECFDF5|#059669',Preco:'#ECFDF5|#059669','Concorr\u00eancia':'#EFF6FF|#1D4ED8'};
+  function ph(p){const[bg,fg]=(PC[p]||'#F3F3F1|#1A1A19').split('|');return`<span style="background:${bg};color:${fg};padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap">${p||'\u2014'}</span>`;}
+  function fb(v){return'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});}
+  const FL={pilar1:'Pilar 1',pilar2:'Pilar 2',mc:'Motivo Central',dif:'Dif. T\u00e9cnica',ret:'Reten\u00e7\u00e3o',all:'Todos'};
+  const ts='padding:10px 12px;background:#1A2B4A;color:#fff;font-size:11px;font-weight:600;text-align:left;white-space:nowrap;position:sticky;top:0;z-index:1';
+  const rows=filtered.map((r,i)=>{
+    const[n,emp,email,dtA,dtC,tempo,mrr,p1,p2,mc,sint,mot,det,sug,tec,ret,anal]=r;
+    const bg=i%2===0?'#fff':'#f8f9fa';
+    const ef=emp&&emp===emp.toUpperCase()&&emp.length>3?emp[0]+emp.slice(1).toLowerCase():emp||'\u2014';
+    return`<tr style="background:${bg}"><td style="text-align:center;color:#8a9aaa;font-size:13px;padding:10px 8px">${n}</td><td style="font-weight:600;font-size:14px;padding:10px 8px">${ef}</td><td style="font-size:12px;color:#5a6a80;padding:10px 8px">${email||'\u2014'}</td><td style="text-align:center;font-size:13px;padding:10px 8px;white-space:nowrap">${dtA||'\u2014'}</td><td style="text-align:center;font-size:13px;padding:10px 8px;white-space:nowrap">${dtC||'\u2014'}</td><td style="text-align:center;font-size:13px;color:#2563eb;padding:10px 8px">${tempo?tempo+' dias':'\u2014'}</td><td style="text-align:right;font-size:13px;padding:10px 8px;white-space:nowrap">${fb(mrr)}</td><td style="text-align:center;padding:10px 8px">${ph(p1)}</td><td style="text-align:center;padding:10px 8px">${ph(p2)}</td><td style="font-weight:700;font-size:13px;text-align:center;background:#FFFBEB;color:#92400E;padding:10px 8px">${mc||'\u2014'}</td><td style="font-size:12px;font-style:italic;padding:10px 8px;max-width:280px;line-height:1.6">${sint||'\u2014'}</td><td style="font-size:13px;padding:10px 8px;max-width:200px;line-height:1.6">${mot||'\u2014'}</td><td style="font-size:12px;color:#5a6a80;padding:10px 8px;max-width:200px;line-height:1.6">${det||'\u2014'}</td><td style="font-size:12px;color:#5a6a80;padding:10px 8px;max-width:180px;line-height:1.6">${sug||'\u2014'}</td><td style="text-align:center;padding:10px 8px">${tec==='Sim'?'<span style="background:#dbeafe;color:#1d4ed8;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Sim</span>':'<span style="color:#9ca3af;font-size:12px">N\u00e3o</span>'}</td><td style="text-align:center;padding:10px 8px">${ret==='Sim'?'<span style="background:#d1fae5;color:#065f46;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Sim</span>':ret==='N\u00e3o'?'<span style="background:#fee2e2;color:#991b1b;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">N\u00e3o</span>':'<span style="color:#9ca3af;font-size:12px">\u2014</span>'}</td><td style="font-size:12px;color:#5a6a80;padding:10px 8px;max-width:500px;line-height:1.7">${anal||'\u2014'}</td></tr>`;
+  }).join('');
+  const pg=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pontua \u00b7 ${FL[field]||field}${value&&field!=='all'?' = '+value:''} (${filtered.length})</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f4f8}.hdr{background:linear-gradient(135deg,#1A2B4A,#2563EB);color:#fff;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.18)}.hdr h1{font-size:17px;font-weight:700}.hdr p{font-size:12px;opacity:.8;margin-top:2px}.tag{background:rgba(255,255,255,.18);padding:4px 14px;border-radius:20px;font-size:13px;font-weight:600}.cbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 18px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;text-decoration:none}.cbtn:hover{background:rgba(255,255,255,.22)}.wrap{overflow-x:auto;margin:16px 20px;border-radius:12px;border:1px solid #d1d8e0}table{border-collapse:collapse;width:100%;min-width:2400px}tr:hover{background:#f0f7ff!important}td{border-bottom:1px solid #e9ecef;vertical-align:top;word-break:break-word}.foot{text-align:center;font-size:12px;color:#6b7280;padding:16px}</style></head><body><div class="hdr"><div><h1>Pontua \u00b7 Base 2026 \u00b7 ${FL[field]||field}${value&&field!=='all'?' = '+value:''}</h1><p>${filtered.length} registro${filtered.length!==1?'s':''} \u00b7 Jan\u2013Mar 2026</p></div><div style="display:flex;gap:10px;align-items:center"><span class="tag">${filtered.length}/${base.length}</span><a href="javascript:window.close()" class="cbtn">\u2715 Fechar</a></div></div><div class="wrap"><table><thead><tr>${COLS.map(c=>`<th style="${ts}">${c}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div><div class="foot">Pontua \u00b7 Equipe Relacionamento e CX</div></body></html>`;
+  window.open(URL.createObjectURL(new Blob([pg],{type:'text/html;charset=utf-8'})),'_blank','noopener');
+}
+
+window.addEventListener('DOMContentLoaded',function(){
+  (function(){
+    const arr=PONTUA_DATA.mensal;
+    if(!arr||!arr.length)return;
+    const data=[];
+    arr.forEach(d=>{
+      const bi=+d.baseIn,ve=+d.vendidos,ca=+d.cancel,mr=+d.mrr;
+      data.push({mes:d.mes,baseIn:bi,vendidos:ve,cancel:ca,baseFim:bi+ve-ca,
+        churnMes:bi?ca/bi:0,mrr:mr,churn_mrr:+(d.churn_mrr||0),mrr_base:+(d.mrr_base||0)});
+    });
+    const b0=data[0].baseIn;let ac=0,mac=0;
+    data.forEach(d=>{ac+=d.cancel;mac+=d.mrr;d.churnAcum=b0?ac/b0:0;d.mrrAcum=mac;});
+    renderChurnFromData(data,0.027904,0.022044,2441.00,106559.32);
+  })();
+  renderDiagFromData(PONTUA_DATA.pilaresDiag,PONTUA_DATA.sugRows,PONTUA_DATA.subMot);
+  renderPilaresFromData(PONTUA_DATA.pilaresAnalise);
+  renderBaseArr(PONTUA_DATA.base);
+});
+
+</script>
+</body>
+</html>
