@@ -39,7 +39,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-h
 .fi.show{display:flex}
 .fi-dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
 .fi-x{color:var(--lt);cursor:pointer;margin-left:2px;font-size:13px}.fi-x:hover{color:var(--tx)}
-.nav{display:flex;gap:2px}
+.nav{display:flex;gap:2px;overflow-x:auto}
 .ntab{padding:4px 12px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;
   color:var(--mu);transition:all .15s;border:none;background:none}
 .ntab:hover{background:var(--sf2);color:var(--tx)}
@@ -175,15 +175,61 @@ tr.tr-sub td{font-size:12px}
 
 /* ── Mobile & legibility upgrades ────────────────────────── */
 @media(max-width:768px){
-  .page{padding:.75rem .6rem}
-  .nav{gap:4px}
-  .tab-btn{padding:.45rem .7rem;font-size:11px}
-  #kpiGrid{grid-template-columns:repeat(2,1fr)!important}
-  .cg{grid-template-columns:1fr!important}
-  .base-wrap table{font-size:13px}
-  .pc-card{padding:.9rem}
-  .pc-count{font-size:2rem}
-  h2{font-size:1.1rem}
+  /* Layout */
+  .page{padding:.6rem .5rem}
+  .nav{gap:3px;flex-wrap:wrap}
+  .tab-btn{padding:.4rem .6rem;font-size:11px;min-width:0;flex:1}
+  h2{font-size:1.05rem}
+
+  /* KPIs: 2 colunas no mobile */
+  #kpiGrid{grid-template-columns:repeat(2,1fr)!important;gap:8px!important}
+  .kv{font-size:1.45rem!important}
+  .kl{font-size:11px!important}
+  .ks{font-size:11px!important}
+
+  /* Gráficos: 1 coluna */
+  .cg{grid-template-columns:1fr!important;gap:10px!important}
+  .cw2{height:320px!important}
+
+  /* Gráficos de pilar no Diagnóstico: mais altura no mobile */
+  .cw2:has(#cPilH),.cw2:has(#cPilD){height:380px!important}
+
+  /* Tabelas: scroll horizontal, fonte menor */
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tw table{min-width:520px;font-size:12px}
+  .tw th,.tw td{padding:7px 8px!important;font-size:12px!important}
+  .mc-chip{font-size:11px!important;padding:2px 6px!important}
+
+  /* Cards pilares */
+  .pc-card{padding:.8rem}
+  .pc-name{font-size:1.05rem!important}
+  .pc-count{font-size:1.8rem!important}
+  .pc-diag{font-size:11px!important}
+  .pc-ml{font-size:12px!important}
+  .m-compare{grid-template-columns:repeat(3,1fr);gap:6px}
+  .m-box .m-val{font-size:1.2rem}
+  .m-box .m-lbl{font-size:9px}
+
+  /* Base 2026 */
+  .base-wrap table{font-size:12px!important}
+  .td-anal{min-width:500px!important}
+  .td-sint{min-width:120px!important}
+
+  /* Chips evolutivos */
+  .mc-months{flex-wrap:wrap;gap:4px}
+  .trend-badge{font-size:10px!important;padding:1px 5px!important}
+
+  /* Scroll duplo */
+  .base-scroll-top{height:12px}
+}
+
+/* Viewport fix para não cortar */
+@media(max-width:480px){
+  #kpiGrid{grid-template-columns:1fr 1fr!important}
+  .tab-btn{font-size:10px;padding:.35rem .5rem}
+  .cw2{height:280px!important}
+  .cw2:has(#cPilH),.cw2:has(#cPilD){height:340px!important}
+  .kv{font-size:1.3rem!important}
 }
 body{font-size:15px}
 .kl{font-size:12px!important}
@@ -306,8 +352,8 @@ td{font-size:13px!important;padding:8px 10px!important}
     <div class="kg" id="diagKpi"></div>
     <div class="dv"></div>
     <div class="cg">
-      <div class="cc"><div class="ct">Cancelamentos por pilar</div><div class="cw2" style="height:460px"><canvas id="cPilH"></canvas></div></div>
-      <div class="cc"><div class="ct">Proporção por pilar (%)</div><div class="cw2" style="height:460px"><canvas id="cPilD"></canvas></div></div>
+      <div class="cc"><div class="ct">Cancelamentos por pilar</div><div class="cw2" style="height:300px"><canvas id="cPilH"></canvas></div></div>
+      <div class="cc"><div class="ct">Proporção por pilar (%)</div><div class="cw2" style="height:300px"><canvas id="cPilD"></canvas></div></div>
     </div>
     <div class="dv"></div>
     <div class="sl">Distribuição de sub-motivos</div>
@@ -623,7 +669,9 @@ function renderChurnFromData(data,medChurn,medChurnMrr,medMrr,medBase){
 
 function renderDiagFromData(pilarArr,sugArr,subMotArr){
   if(!pilarArr||!pilarArr.length)return;
-  const pN=pilarArr.map(p=>p.name),pQ=pilarArr.map(p=>+p.qtd),pP=pilarArr.map(p=>+p.pct);
+  // Filtrar pilares sem cancelamentos
+  const pilarAtivo=pilarArr.filter(p=>+p.qtd>0);
+  const pN=pilarAtivo.map(p=>p.name),pQ=pilarAtivo.map(p=>+p.qtd),pP=pilarAtivo.map(p=>+p.pct);
   const tot=pQ.reduce((s,v)=>s+v,0)||66;
   const mo=PONTUA_DATA.months||{};
   const fev=mo['Fevereiro']||{},mar=mo['Marco']||{},abr=mo['Abril']||{};
@@ -673,30 +721,30 @@ function renderDiagFromData(pilarArr,sugArr,subMotArr){
   dC('cPilH');CH.cPilH=new Chart(document.getElementById('cPilH'),{type:'bar',
     data:{labels:pN,datasets:[
       {label:'M-3 Fev',data:pN.map(n=>(fev.pilares||{})[n]||0),
-       backgroundColor:'rgba(194,65,12,0.45)',borderRadius:3,
-       datalabels:{display:true,color:'#c2410c',anchor:'end',align:'right',
-         font:{size:11,weight:'600',family:"'DM Mono',monospace"},
-         formatter:v=>v?v+' ('+Math.round(v/tF*100)+'%)':''}},
+       backgroundColor:'rgba(194,65,12,0.45)',borderRadius:2,
+       datalabels:{display:true,color:'#c2410c',anchor:'end',align:'top',offset:2,
+         font:{size:10,weight:'600',family:"'DM Mono',monospace"},
+         formatter:v=>v?v+'\n('+Math.round(v/tF*100)+'%)':''}},
       {label:'M-2 Mar',data:pN.map(n=>(mar.pilares||{})[n]||0),
-       backgroundColor:'rgba(124,58,237,0.45)',borderRadius:3,
-       datalabels:{display:true,color:'#7c3aed',anchor:'end',align:'right',
-         font:{size:11,weight:'600',family:"'DM Mono',monospace"},
-         formatter:v=>v?v+' ('+Math.round(v/tM*100)+'%)':''}},
+       backgroundColor:'rgba(124,58,237,0.45)',borderRadius:2,
+       datalabels:{display:true,color:'#7c3aed',anchor:'end',align:'top',offset:2,
+         font:{size:10,weight:'600',family:"'DM Mono',monospace"},
+         formatter:v=>v?v+'\n('+Math.round(v/tM*100)+'%)':''}},
       {label:'M-1 Abr',data:pN.map(n=>(abr.pilares||{})[n]||0),
-       backgroundColor:colors.map(c=>c+'cc'),borderRadius:4,
-       datalabels:{display:true,color:colors,anchor:'end',align:'right',
-         font:{size:12,weight:'700',family:"'DM Mono',monospace"},
-         formatter:v=>v?v+' ('+Math.round(v/tA*100)+'%) \u25b6':''}},
+       backgroundColor:colors.map(c=>c+'cc'),borderRadius:2,
+       datalabels:{display:true,color:colors,anchor:'end',align:'top',offset:2,
+         font:{size:11,weight:'700',family:"'DM Mono',monospace"},
+         formatter:v=>v?v+'\n('+Math.round(v/tA*100)+'%)':''}},
     ]},
-    options:{...bO,indexAxis:'y',
+    options:{...bO,
       scales:{
-        x:{ticks:{color:tC,font:{size:12}},grid:{color:gC}},
-        y:{ticks:{color:tC,font:{size:13,weight:'600'}},grid:{display:false}}
+        x:{ticks:{color:tC,font:{size:13,weight:'600'}},grid:{display:false}},
+        y:{ticks:{color:tC,font:{size:11}},grid:{color:gC}}
       },
       plugins:{...bO.plugins,datalabels:{display:true},
         legend:{display:true,position:'bottom',
-          labels:{boxWidth:12,font:{size:12},color:tC}}},
-      layout:{padding:{right:110,top:8}},
+          labels:{boxWidth:14,font:{size:13},color:tC}}},
+      layout:{padding:{top:28,left:4,right:4}},
       onClick:(evt,items)=>{
         if(!items.length)return;
         const pilar=pN[items[0].index];
@@ -715,7 +763,7 @@ function renderDiagFromData(pilarArr,sugArr,subMotArr){
       backgroundColor:colors,borderWidth:2,borderColor:'#fff',
       datalabels:{display:true,color:'#fff',font:{size:12,weight:'700'},
         formatter:(v,ctx)=>v>0?pN[ctx.dataIndex].substring(0,4)+'\n'+v+'%':''}}]},
-    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+    options:{responsive:true,maintainAspectRatio:false,cutout:'52%',
       plugins:{legend:{display:true,position:'bottom',
         labels:{boxWidth:12,font:{size:12},color:tC}},datalabels:{display:true}},
       layout:{padding:8},
