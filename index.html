@@ -778,11 +778,19 @@ function renderDiagFromData(pilarArr,sugArr,subMotArr){
   function trendBadge(m2Pct,m1Pct,higherBad=true){
     const d=m1Pct-m2Pct;
     if(Math.abs(d)<0.005)return`<span class="trend-badge trend-eq">\u2192 Est\u00e1vel</span>`;
-    const good=higherBad?d<0:d>0;
     const pp=Math.abs(d*100).toFixed(1);
-    return good
-      ?`<span class="trend-badge trend-dn">\u2193 ${pp}pp</span>`
-      :`<span class="trend-badge trend-up">\u2191 ${pp}pp</span>`;
+    if(higherBad){
+      // cancelamentos: aumento é ruim (↑ vermelho), queda é boa (↓ verde)
+      return d>0
+        ?`<span class="trend-badge trend-up">\u2191 ${pp}pp</span>`
+        :`<span class="trend-badge trend-dn">\u2193 ${pp}pp</span>`;
+    } else {
+      // sugestões: aumento é bom (↑ vermelho pois é alerta), queda é neutro (↓ verde)
+      // CORREÇÃO: aumento de sugestão = vermelho (requer ação), queda = verde (positivo)
+      return d>0
+        ?`<span class="trend-badge trend-up">\u2191 ${pp}pp</span>`
+        :`<span class="trend-badge trend-dn">\u2193 ${pp}pp</span>`;
+    }
   }
   function chip(v,pct,cls){
     const clr=cls==='m-fev'?'#c2410c':cls==='m-mar'?'#7c3aed':'#0e7490';
