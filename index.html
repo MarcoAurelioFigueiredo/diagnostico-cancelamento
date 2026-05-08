@@ -318,8 +318,7 @@ td{font-size:13px!important;padding:8px 10px!important}
     <div class="sl">Detalhamento mensal</div>
     <div class="tw"><table><thead><tr>
       <th style="white-space:nowrap;min-width:80px;max-width:90px">Mês</th><th>Base início</th><th>+ Vendidos</th><th>− Cancelados</th>
-      <th>Base fim</th><th>Churn %</th><th>MRR Cancel. Médio</th><th>Churn acum.</th>
-      <th style="color:#0e7490;white-space:nowrap">Churn MRR %</th>
+      <th>Base fim</th><th>Churn %</th><th>MRR Cancel. Médio</th><th style="color:#0e7490;white-space:nowrap">Churn MRR %</th>
       <th style="color:#0e7490;white-space:nowrap">MRR Base Total</th>
     </tr></thead><tbody id="mainTbody"></tbody></table></div>
     <div class="lgr">
@@ -633,8 +632,8 @@ function renderChurnFromData(data,medChurn,medChurnMrr,medMrr,medBase){
     <div class="kpi ks2"><div class="kl">MRR Base Total Atual</div><div class="kv cs">${fB(last.mrr_base||0)}</div><div class="ks">${last.mes} (\u00faltimo m\u00eas)</div></div>`;
   let a2=0;
   document.getElementById('mainTbody').innerHTML=data.map(d=>{a2+=d.cancel;const ac=b0?a2/b0:0;
-    return`<tr><td style="white-space:nowrap">${d.mes}</td><td>${fI(d.baseIn)}</td><td style="color:var(--ok)">+${d.vendidos}</td><td style="color:var(--dn)">-${d.cancel}</td><td>${fI(d.baseFim)}</td><td><span class="pill ${pC(d.churnMes)}">${fP(d.churnMes)}</span></td><td>${fB(d.mrr)}</td><td><span class="pill ${pC(ac)}">${fP(ac)}</span></td><td><span class="pill ${pC(d.churn_mrr||0)}">${((d.churn_mrr||0)*100).toFixed(2)}%</span></td><td style="text-align:right">${fB(d.mrr_base||0)}</td></tr>`;
-  }).join('')+`<tr class="tr-total"><td>Total/M\u00e9dia</td><td>${fI(b0)}</td><td style="color:var(--ok)">+${fI(data.reduce((s,d)=>s+d.vendidos,0))}</td><td style="color:var(--dn)">-${fI(totC)}</td><td>${fI(last.baseFim)}</td><td><span class="pill ${pC(medChurn)}">${(medChurn*100).toFixed(2)}% med.</span></td><td>${fB(medMrr)} med.</td><td><span class="pill ${pC(last.churnAcum)}">${fP(last.churnAcum)} ac.</span></td><td><span class="pill ${pC(medChurnMrr)}">${(medChurnMrr*100).toFixed(2)}% med.</span></td><td style="text-align:right">${fB(medBase)} med.</td></tr>`;
+    return`<tr><td style="white-space:nowrap">${d.mes}</td><td>${fI(d.baseIn)}</td><td style="color:var(--ok)">+${d.vendidos}</td><td style="color:var(--dn)">-${d.cancel}</td><td>${fI(d.baseFim)}</td><td><span class="pill ${pC(d.churnMes)}">${fP(d.churnMes)}</span></td><td>${fB(d.mrr)}</td><td><span class="pill ${pC(d.churn_mrr||0)}">${((d.churn_mrr||0)*100).toFixed(2)}%</span></td><td style="text-align:right">${fB(d.mrr_base||0)}</td></tr>`;
+  }).join('')+`<tr class="tr-total"><td>Total/M\u00e9dia</td><td>${fI(b0)}</td><td style="color:var(--ok)">+${fI(data.reduce((s,d)=>s+d.vendidos,0))}</td><td style="color:var(--dn)">-${fI(totC)}</td><td>${fI(last.baseFim)}</td><td><span class="pill ${pC(medChurn)}">${(medChurn*100).toFixed(2)}% med.</span></td><td>${fB(medMrr)} med.</td><td><span class="pill ${pC(medChurnMrr)}">${(medChurnMrr*100).toFixed(2)}% med.</span></td><td style="text-align:right">${fB(medBase)} med.</td></tr>`;
   const dlB={display:true,font:{size:11,weight:'700',family:"'DM Mono',monospace"},anchor:'end',align:'top',offset:2};
   dC('cMedio');CH.cMedio=new Chart(document.getElementById('cMedio'),{type:'bar',data:{labels,datasets:[
     {type:'line',data:data.map(()=>+(medChurn*100).toFixed(2)),borderColor:'#2563eb',borderDash:[5,4],borderWidth:1.5,pointRadius:0,backgroundColor:'transparent',datalabels:{display:false}},
